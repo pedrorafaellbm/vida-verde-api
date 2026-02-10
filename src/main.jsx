@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import { Login } from './pages/Login.jsx';
+import { Register } from './pages/Register.jsx';
 import { Home } from './pages/Home.jsx';
 import { Contato } from './pages/Contato.jsx';
 
@@ -34,6 +35,10 @@ const router2 = createBrowserRouter([
   {
     path: "/login",
     element: <Login />, // sem Navbar e Footer
+  },
+  {
+    path: "/register",
+    element: <Register />, // sem Navbar e Footer
   },
 ]);
 
