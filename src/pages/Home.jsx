@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import { api } from '../service/api'
 
 export const Home = () => {
-  const [loading, setLoading] = useState(true)
   const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(import.meta.env.VITE_API_BASE_URL + 'produtos')
+      const response = await api.get('/api/produtos')
       const data = response.data.data
+
+      console.log('Produtos carregados:', data);
+      
       setProducts(data)
-      console.log('Produtos carregados', data)
-    } catch (error) {
-      console.error('Erro ao carregar os produtos:', error)
-      setError('Erro ao carregar os produtos')
+    } catch (err) {
+      console.error('Erro ao carregar os produtos:', err)
+      setError('Erro ao carregar produtos')
     } finally {
       setLoading(false)
     }
@@ -24,17 +26,20 @@ export const Home = () => {
     fetchProducts()
   }, [])
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
+  if (loading) return <p>Carregando produtos...</p>
+  if (error) return <p>{error}</p>
 
   return (
     <div>
       <h1>Home</h1>
-      <ul>
-        {products.map(product => (
-          <li key={product.id}>{product.name}</li>
-        ))}
-      </ul>
+
+      {products.length === 0 && <p>Nenhum produto encontrado</p>}
+
+      {products.map(p => (
+        <div key={p.id}>
+          {p.nome}
+        </div>
+      ))}
     </div>
   )
 }

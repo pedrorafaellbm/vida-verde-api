@@ -1,49 +1,55 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Layout from './components/Layout.jsx';
-import { Login } from './pages/Login.jsx';
-import { Register } from './pages/Register.jsx';
-import { Home } from './pages/Home.jsx';
-import { Contato } from './pages/Contato.jsx';
+import 'bootstrap/dist/css/bootstrap.min.css'
 
-/* const router = createBrowserRouter([
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from 'react-router-dom'
+
+import Layout from './components/Layout.jsx'
+import { Login } from './pages/Login.jsx'
+import { Home } from './pages/Home.jsx'
+import { Contato } from './pages/Contato.jsx'
+
+/* 🔒 Proteção de rota */
+const PrivateRoute = ({ children }) => {
+  const token = localStorage.getItem('token')
+  return token ? children : <Navigate to="/login" replace />
+}
+
+const router = createBrowserRouter([
   {
-    path: "/",
-    //element: <div>Hello world!</div>,
-    element: <Home />,
+    path: '/',
+    element: <Navigate to="/login" replace />,
   },
-]); */
-
-const router2 = createBrowserRouter([
   {
-    element: <Layout />, // todas as rotas dentro terão Navbar + Footer
+    path: '/login',
+    element: <Login />, // ❌ sem NavBar e Footer
+  },
+  {
+    element: (
+      <PrivateRoute>
+        <Layout />
+      </PrivateRoute>
+    ),
     children: [
       {
-        path: "/",
+        path: '/home',
         element: <Home />,
       },
       {
-        path: "/contato",
+        path: '/contato',
         element: <Contato />,
       },
     ],
   },
-  {
-    path: "/login",
-    element: <Login />, // sem Navbar e Footer
-  },
-  {
-    path: "/register",
-    element: <Register />, // sem Navbar e Footer
-  },
-]);
+])
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router2} />
-  </StrictMode>,
+    <RouterProvider router={router} />
+  </StrictMode>
 )

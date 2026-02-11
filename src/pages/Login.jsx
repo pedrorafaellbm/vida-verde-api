@@ -1,74 +1,105 @@
-import { useState } from "react";
-import { api } from "../service/api";
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './login.css'
 
+export const Login = () => {
+  const navigate = useNavigate()
 
-export function Login() {
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [senha, setSenha] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setLoading(true)
+  const togglePassword = () => {
+    setShowPassword(!showPassword)
+  }
+
+  const login = async () => {
+    setError('')
 
     try {
-      const response = await api.post('/auth/login', {
-        email,
-        password,
+      const response = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          senha,
+        }),
       })
 
-      // exemplo esperado do back
-      // { token, role }
-      const { token, role } = response.data
+      const data = await response.json()
 
-      localStorage.setItem('token', token)
-      localStorage.setItem('role', role)
+      if (!response.ok) {
+        throw new Error(data.mensagem || 'Erro ao realizar login')
+      }
 
-      alert('Login realizado com sucesso!')
+      // 🔐 Salvar dados no localStorage
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('usuario', JSON.stringify(data.usuario))
 
-      // redirects futuros por role
-      // admin -> /admin
-      // empresa -> /dashboard
-      // comprador -> /home
-    } catch {
-      alert('Email ou senha inválidos')
-    } finally {
-      setLoading(false)
+      // 🚀 Redirecionar para Home
+      navigate('/home')
+    } catch (err) {
+      setError(err.message || 'Email ou senha inválidos')
     }
   }
 
   return (
     <div className="login-container">
       <div className="login-card">
-        <h1>Entrar</h1>
-        <p className="subtitle">Acesse sua conta</p>
+        <h1>🌱 Vida Verde</h1>
+        <div className="subtitle">Acesso do usuário</div>
 
-        <form onSubmit={handleSubmit}>
+        <div>
+          <label>Email</label>
           <input
             type="email"
-            placeholder="Email"
+            placeholder="email@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
           />
+        </div>
 
-          <input
-            type="password"
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+        <div>
+          <label>Senha</label>
+          <div style={{ position: 'relative' }}>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              style={{ paddingRight: '2.5rem' }}
+            />
+            <span
+              onClick={togglePassword}
+              style={{
+                position: 'absolute',
+                right: '0.75rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                cursor: 'pointer',
+                color: '#1da145',
+                fontSize: '1.2rem'
+              }}
+            >
+              <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+            </span>
+          </div>
+        </div>
 
-          <button type="submit" disabled={loading}>
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
+        <button onClick={login}>
+          Entrar
+        </button>
 
-        <p className="footer-text">
+        {error && (
+          <div className="text-danger text-center mt-2">
+            {error}
+          </div>
+        )}
+        <div className="footer-text mt-3">
           Não tem conta? <a href="/register">Cadastre-se</a>
-        </p>
+        </div>
       </div>
     </div>
   )
