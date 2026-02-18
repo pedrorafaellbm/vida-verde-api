@@ -1,26 +1,46 @@
 import { useState } from "react";
-import { RoleSelect } from "../components/RoleSelect";
 import { api } from "../service/api";
-import './register.css'
+import "./register.css";
 
 export function Register() {
-  const [role, setRole] = useState('comprador')
-  const [form, setForm] = useState({})
+  const [role, setRole] = useState("comprador");
+  const [form, setForm] = useState({});
+  const [loading, setLoading] = useState(false);
 
   function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    setForm({ ...form, [e.target.name]: e.target.value });
   }
 
   async function handleSubmit(e) {
-    e.preventDefault()
-
-    if (role === 'admin') return
+    e.preventDefault();
+    setLoading(true);
 
     try {
-      await api.post('/auth/register', { ...form, role })
-      alert('Cadastro realizado com sucesso!')
-    } catch {
-      alert('Erro ao cadastrar')
+      if (role === "empresa") {
+        await api.post("/auth/register/empresa", {
+          nome: form.name,
+          email: form.email,
+          senha: form.password,
+          nomeEmpresa: form.companyName,
+          cnpj: form.cnpj,
+        });
+      }
+
+      if (role === "comprador") {
+        await api.post("/auth/register/comprador", {
+          nome: form.name,
+          email: form.email,
+          senha: form.password,
+          cpf: form.cpf,
+        });
+      }
+
+      alert("Cadastro realizado com sucesso!");
+      window.location.href = "/login";
+    } catch (error) {
+      alert(error.response?.data?.error || "Erro ao cadastrar");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -36,24 +56,60 @@ export function Register() {
         </select>
 
         <form onSubmit={handleSubmit}>
-          <input name="name" placeholder="Nome completo" onChange={handleChange} />
-          <input name="email" type="email" placeholder="Email" onChange={handleChange} />
-          <input name="password" type="password" placeholder="Senha" onChange={handleChange} />
+          <input
+            name="name"
+            placeholder="Nome completo"
+            onChange={handleChange}
+            required
+          />
 
-          {role === 'empresa' && (
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            name="password"
+            type="password"
+            placeholder="Senha"
+            onChange={handleChange}
+            required
+          />
+
+          {role === "empresa" && (
             <>
-              <input name="companyName" placeholder="Nome da empresa" onChange={handleChange} />
-              <input name="cnpj" placeholder="CNPJ" onChange={handleChange} />
+              <input
+                name="companyName"
+                placeholder="Nome da empresa"
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="cnpj"
+                placeholder="CNPJ"
+                onChange={handleChange}
+                required
+              />
             </>
           )}
 
-          {role === 'comprador' && (
-            <input name="cpf" placeholder="CPF" onChange={handleChange} />
+          {role === "comprador" && (
+            <input
+              name="cpf"
+              placeholder="CPF"
+              onChange={handleChange}
+              required
+            />
           )}
 
-          <button type="submit">Cadastrar</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Cadastrando..." : "Cadastrar"}
+          </button>
         </form>
       </div>
     </div>
-  )
+  );
 }

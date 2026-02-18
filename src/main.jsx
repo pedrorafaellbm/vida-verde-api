@@ -11,6 +11,7 @@ import {
 
 import Layout from './components/Layout.jsx'
 import { Login } from './pages/Login.jsx'
+import { Register } from './pages/Register.jsx'
 import { Home } from './pages/Home.jsx'
 import { Contato } from './pages/Contato.jsx'
 
@@ -23,11 +24,15 @@ const PrivateRoute = ({ children }) => {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/login" replace />,
+    element: <Navigate to="/register" replace />,
   },
   {
     path: '/login',
     element: <Login />, // ❌ sem NavBar e Footer
+  },
+  {
+    path: '/register',
+    element: <Register />,
   },
   {
     element: (
