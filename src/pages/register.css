@@ -28,7 +28,6 @@
   margin-bottom: 1.5rem;
 }
 
-.register-card select,
 .register-card input {
   width: 100%;
   padding: 0.75rem;
@@ -38,8 +37,7 @@
   font-size: 0.95rem;
 }
 
-.register-card input:focus,
-.register-card select:focus {
+.register-card input:focus {
   outline: none;
   border-color: #1da145;
 }
@@ -59,4 +57,9 @@
 
 .register-card button:hover {
   background: #1da145;
+}
+
+.register-card .footer-text {
+  margin-top: 1rem;
+  text-align: center;
 }

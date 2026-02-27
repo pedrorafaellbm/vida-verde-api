@@ -28,24 +28,15 @@ export const Login = () => {
 
       const { token, usuario } = response.data;
 
-      // 🔐 Salvar no localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      // 🚀 Redirecionamento por tipo
-      if (usuario.tipo === "admin") {
-        navigate("/admin");
-      } else if (usuario.tipo === "empresa") {
-        navigate("/dashboard");
-      } else {
-        navigate("/home");
-      }
-
+      navigate("/home");
     } catch (err) {
       setError(
         err.response?.data?.error ||
-        err.response?.data?.mensagem ||
-        "Email ou senha inválidos"
+          err.response?.data?.mensagem ||
+          "Email ou senha invalidos"
       );
     } finally {
       setLoading(false);
@@ -55,8 +46,8 @@ export const Login = () => {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h1>🌱 Vida Verde</h1>
-        <div className="subtitle">Acesso do usuário</div>
+        <h1>Vida Verde</h1>
+        <div className="subtitle">Acesso do comprador</div>
 
         <div>
           <label>Email</label>
@@ -98,14 +89,10 @@ export const Login = () => {
           {loading ? "Entrando..." : "Entrar"}
         </button>
 
-        {error && (
-          <div className="text-danger text-center mt-2">
-            {error}
-          </div>
-        )}
+        {error && <div className="text-danger text-center mt-2">{error}</div>}
 
         <div className="footer-text mt-3">
-          Não tem conta? <a href="/register">Cadastre-se</a>
+          Nao tem conta? <a href="/register">Cadastre-se</a>
         </div>
       </div>
     </div>

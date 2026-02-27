@@ -24,11 +24,11 @@ const PrivateRoute = ({ children }) => {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/register" replace />,
+    element: <Navigate to="/login" replace />,
   },
   {
     path: '/login',
-    element: <Login />, // ❌ sem NavBar e Footer
+    element: <Login />,
   },
   {
     path: '/register',
