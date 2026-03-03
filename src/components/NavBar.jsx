@@ -1,48 +1,22 @@
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
+﻿import { NavLink } from 'react-router-dom'
 
-const NavBar = () => {
+export const Navbar = () => {
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-success">
-      <div className="container">
-        <Link className="navbar-brand text-white fw-bold" to="/">
-          🌿 Plantei
-        </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <NavLink className="nav-link text-white" to="/">
-                Home
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link text-white" to="/ofertas">
-                Ofertas
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link text-white" to="/produtos">
-                Produtos
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link text-white" to="/contato">
-                Contato
-              </NavLink>
-            </li>
-          </ul>
-        </div>
+    <nav className="site-nav">
+      <div className="container nav-content">
+        <NavLink to="/home" className="nav-item">
+          Home
+        </NavLink>
+        <NavLink to="/products" className="nav-item">
+          Catálogo
+        </NavLink>
+        <NavLink to="/checkout" className="nav-item">
+          Checkout
+        </NavLink>
+        <NavLink to="/contato" className="nav-item">
+          Contato
+        </NavLink>
       </div>
     </nav>
-  );
-};
-
-export default NavBar;
+  )
+}

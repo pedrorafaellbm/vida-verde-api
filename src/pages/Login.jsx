@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../service/api";
+import { saveAuthSession } from "../service/auth";
 import "./login.css";
 
 export const Login = () => {
@@ -26,10 +27,9 @@ export const Login = () => {
         senha,
       });
 
-      const { token, usuario } = response.data;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("usuario", JSON.stringify(usuario));
+      const token = response.data?.token;
+      const usuario = response.data?.usuario || response.data?.user;
+      saveAuthSession({ token, user: usuario });
 
       navigate("/home");
     } catch (err) {

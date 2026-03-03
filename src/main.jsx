@@ -1,31 +1,28 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Navigate,
-} from 'react-router-dom'
-
-import Layout from './components/Layout.jsx'
-import { Login } from './pages/Login.jsx'
-import { Register } from './pages/Register.jsx'
-import { Home } from './pages/Home.jsx'
-import { Contato } from './pages/Contato.jsx'
-
-/* 🔒 Proteção de rota */
-const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem('token')
-  return token ? children : <Navigate to="/login" replace />
-}
+import Layout from './components/Layout'
+import AdminLayout from './components/admin/AdminLayout'
+import { ProtectedRoute } from './components/ProtectedRoute'
+import { CartProvider } from './context/CartContext'
+import Dashboard from './pages/admin/Dashboard'
+import Categories from './pages/admin/Categories'
+import Orders from './pages/admin/Orders'
+import AdminProducts from './pages/admin/Products'
+import Users from './pages/admin/Users'
+import { Cart } from './pages/Cart'
+import { Checkout } from './pages/Checkout'
+import { Contato } from './pages/Contato'
+import { Home } from './pages/Home'
+import { Login } from './pages/Login'
+import { ProductDetails } from './pages/ProductDetails'
+import { Products } from './pages/Products'
+import { Profile } from './pages/Profile'
+import { Register } from './pages/Register'
+import './styles/global.css'
 
 const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Navigate to="/login" replace />,
-  },
   {
     path: '/login',
     element: <Login />,
@@ -36,25 +33,89 @@ const router = createBrowserRouter([
   },
   {
     element: (
-      <PrivateRoute>
+      <ProtectedRoute>
         <Layout />
-      </PrivateRoute>
+      </ProtectedRoute>
     ),
     children: [
+      {
+        path: '/',
+        element: <Navigate to="/home" replace />,
+      },
       {
         path: '/home',
         element: <Home />,
       },
       {
+        path: '/products',
+        element: <Products />,
+      },
+      {
+        path: '/products/:id',
+        element: <ProductDetails />,
+      },
+      {
+        path: '/cart',
+        element: <Cart />,
+      },
+      {
+        path: '/checkout',
+        element: <Checkout />,
+      },
+      {
+        path: '/profile',
+        element: <Profile />,
+      },
+      {
         path: '/contato',
         element: <Contato />,
       },
+      {
+        path: '/contact',
+        element: <Navigate to="/contato" replace />,
+      },
     ],
+  },
+  {
+    path: '/admin',
+    element: (
+      <ProtectedRoute requireAdmin>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: 'products',
+        element: <AdminProducts />,
+      },
+      {
+        path: 'orders',
+        element: <Orders />,
+      },
+      {
+        path: 'users',
+        element: <Users />,
+      },
+      {
+        path: 'categories',
+        element: <Categories />,
+      },
+    ],
+  },
+  {
+    path: '*',
+    element: <Navigate to="/home" replace />,
   },
 ])
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <CartProvider>
+      <RouterProvider router={router} />
+    </CartProvider>
   </StrictMode>
 )

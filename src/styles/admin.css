@@ -1,0 +1,290 @@
+.admin-shell {
+  min-height: 100vh;
+  background: #f3f6f4;
+}
+
+.admin-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100vh;
+  padding: 24px 16px;
+  border-right: 1px solid #d7e3dc;
+  background: #ffffff;
+}
+
+.admin-brand {
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1f4e3a;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-nav-link {
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #3f5a4e;
+  font-weight: 600;
+}
+
+.admin-nav-link.active {
+  background: #dff0e7;
+  color: #1f5f43;
+}
+
+.admin-main {
+  margin-left: 240px;
+  min-height: 100vh;
+}
+
+.admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #d7e3dc;
+}
+
+.admin-title {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.admin-subtitle {
+  margin: 4px 0 0;
+  color: #5f7469;
+}
+
+.admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-user {
+  font-weight: 600;
+  color: #395447;
+}
+
+.admin-content {
+  padding: 24px;
+}
+
+.admin-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.admin-section-header h2 {
+  margin: 0;
+}
+
+.admin-section-header p {
+  margin: 0;
+  color: #5f7469;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.admin-stat-card {
+  background: #fff;
+  border: 1px solid #d7e3dc;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-stat-title {
+  margin: 0;
+  color: #5f7469;
+  font-size: 0.9rem;
+}
+
+.admin-stat-value {
+  font-size: 1.5rem;
+  color: #1f4e3a;
+}
+
+.admin-stat-helper {
+  color: #5f7469;
+  font-size: 0.85rem;
+}
+
+.admin-table-wrap {
+  overflow: auto;
+  border: 1px solid #d7e3dc;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #edf2ef;
+}
+
+.admin-table th {
+  background: #f7faf8;
+  color: #365145;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-empty {
+  border: 1px dashed #c8d8cf;
+  border-radius: 12px;
+  background: #fff;
+  padding: 18px;
+}
+
+.admin-error {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #efb9b9;
+  background: #fff2f2;
+  color: #8f2c2c;
+}
+
+.status-pill,
+.role-chip {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.status-pendente {
+  background: #ffefc9;
+  color: #896412;
+}
+
+.status-processando {
+  background: #dcefff;
+  color: #1f5c8f;
+}
+
+.status-enviado {
+  background: #e5e3ff;
+  color: #4f3dad;
+}
+
+.status-entregue {
+  background: #daf4df;
+  color: #2f7a42;
+}
+
+.role-chip {
+  background: #ebf2ee;
+  color: #355145;
+}
+
+.admin-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.admin-form input {
+  min-width: 220px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid #c5d6cc;
+}
+
+.admin-product-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #d7e3dc;
+}
+
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 16, 13, 0.5);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 30;
+}
+
+.admin-modal {
+  width: min(460px, 100%);
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #d7e3dc;
+  padding: 18px;
+}
+
+.admin-modal h3 {
+  margin-top: 0;
+}
+
+.admin-modal p {
+  color: #4b5f55;
+}
+
+.admin-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .admin-sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid #d7e3dc;
+  }
+
+  .admin-main {
+    margin-left: 0;
+  }
+
+  .admin-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-topbar-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
