@@ -177,6 +177,9 @@ a {
   border-radius: 14px;
   background: var(--white);
   overflow: hidden;
+  height: 390px;
+  display: flex;
+  flex-direction: column;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -187,22 +190,32 @@ a {
 
 .product-image-wrap {
   display: block;
+  height: 180px;
+  flex-shrink: 0;
 }
 
 .product-image {
   width: 100%;
-  height: 180px;
+  height: 100%;
   object-fit: cover;
   background: var(--green-050);
 }
 
 .product-info {
   padding: 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .product-info h3 {
   margin: 0 0 8px;
   font-size: 1.02rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .product-price {
@@ -239,6 +252,7 @@ a {
 .product-actions {
   display: flex;
   gap: 8px;
+  margin-top: auto;
 }
 
 .empty-state,

@@ -1,7 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { getUser, isAdmin } from '../service/auth'
-import { Navbar } from './Navbar'
+import { Navbar } from './NavBar'
 
 const formatUserName = () => {
   const user = getUser()
