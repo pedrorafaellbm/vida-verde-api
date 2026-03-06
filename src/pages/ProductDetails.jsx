@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { getStoreProductById } from '../service/storeApi'
+import { addFavorite, isFavorite, removeFavorite } from '../utils/favorites'
 import '../styles/products.css'
 
 const formatPrice = (price) => {
@@ -16,6 +17,7 @@ export const ProductDetails = () => {
   const { addToCart } = useCart()
   const [product, setProduct] = useState(null)
   const [selectedImage, setSelectedImage] = useState('')
+  const [favorited, setFavorited] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -27,6 +29,7 @@ export const ProductDetails = () => {
         const data = await getStoreProductById(id)
         setProduct(data)
         setSelectedImage(data.images[0] || '')
+        setFavorited(isFavorite(data.id))
       } catch {
         setProduct(null)
         setError('Produto nao encontrado.')
@@ -44,6 +47,17 @@ export const ProductDetails = () => {
         <p className="empty-state">Carregando produto...</p>
       </section>
     )
+  }
+
+  const handleToggleFavorite = () => {
+    if (!product) return
+    if (favorited) {
+      removeFavorite(product.id)
+      setFavorited(false)
+    } else {
+      addFavorite(product.id)
+      setFavorited(true)
+    }
   }
 
   if (!product) {
@@ -95,6 +109,13 @@ export const ProductDetails = () => {
 
           <button type="button" className="btn" onClick={() => addToCart(product)}>
             Adicionar ao carrinho
+          </button>
+          <button
+            type="button"
+            className={`btn btn-secondary details-favorite ${favorited ? 'active' : ''}`}
+            onClick={handleToggleFavorite}
+          >
+            {favorited ? '❤ Curtido' : '♡ Curtir'}
           </button>
         </div>
       </div>

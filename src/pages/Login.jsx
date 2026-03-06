@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../service/api";
-import { saveAuthSession } from "../service/auth";
+import { getApiErrorMessage } from "../service/api";
+import { useAuth } from "../context/AuthContext";
 import "./login.css";
 
 export const Login = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -22,22 +23,14 @@ export const Login = () => {
     setLoading(true);
 
     try {
-      const response = await api.post("/auth/login", {
+      await signIn({
         email,
         senha,
       });
 
-      const token = response.data?.token;
-      const usuario = response.data?.usuario || response.data?.user;
-      saveAuthSession({ token, user: usuario });
-
       navigate("/home");
     } catch (err) {
-      setError(
-        err.response?.data?.error ||
-          err.response?.data?.mensagem ||
-          "Email ou senha invalidos"
-      );
+      setError(getApiErrorMessage(err, "Email ou senha invalidos"));
     } finally {
       setLoading(false);
     }

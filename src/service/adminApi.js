@@ -55,4 +55,9 @@ export const updateUserRole = async (id, role) => {
   return response.data?.data
 }
 
+export const deleteUser = async (id) => {
+  const response = await api.delete(`/usuarios/${id}`)
+  return response.data
+}
+
 export { getErrorMessage }

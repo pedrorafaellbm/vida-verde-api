@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { DataTable } from '../../components/admin/DataTable'
 import { getUser } from '../../service/auth'
 import {
+  deleteUser,
   getErrorMessage,
   listAdminUsers,
   updateUserRole,
@@ -49,6 +50,23 @@ export default function Users() {
     }
   }
 
+  const handleDeleteUser = async (user) => {
+    if (user.id === currentUser.id) {
+      setError('Voce nao pode excluir sua propria conta.')
+      return
+    }
+
+    const confirmed = window.confirm(`Deseja excluir o usuario "${user.nome}"?`)
+    if (!confirmed) return
+
+    try {
+      await deleteUser(user.id)
+      setUsers((prev) => prev.filter((item) => item.id !== user.id))
+    } catch (err) {
+      setError(getErrorMessage(err, 'Nao foi possivel excluir o usuario.'))
+    }
+  }
+
   const columns = [
     { key: 'nome', header: 'Nome' },
     { key: 'email', header: 'Email' },
@@ -61,9 +79,14 @@ export default function Users() {
       key: 'acoes',
       header: 'Acoes',
       render: (row) => (
-        <button type="button" className="btn btn-secondary" onClick={() => toggleRole(row)}>
-          Alterar Role
-        </button>
+        <div className="admin-actions">
+          <button type="button" className="btn btn-secondary" onClick={() => toggleRole(row)}>
+            Alterar Role
+          </button>
+          <button type="button" className="btn" onClick={() => handleDeleteUser(row)}>
+            Excluir
+          </button>
+        </div>
       ),
     },
   ]

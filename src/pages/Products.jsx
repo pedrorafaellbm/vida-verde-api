@@ -3,11 +3,13 @@ import { FilterSidebar } from '../components/FilterSidebar'
 import { ProductGrid } from '../components/ProductGrid'
 import { useCart } from '../context/CartContext'
 import { getStoreProducts } from '../service/storeApi'
+import { addFavorite, getFavorites, removeFavorite } from '../utils/favorites'
 import '../styles/products.css'
 
 export const Products = () => {
   const { addToCart } = useCart()
   const [products, setProducts] = useState([])
+  const [favoriteIds, setFavoriteIds] = useState(new Set())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -39,6 +41,21 @@ export const Products = () => {
 
     loadProducts()
   }, [])
+
+  useEffect(() => {
+    setFavoriteIds(new Set(getFavorites()))
+  }, [])
+
+  const toggleFavorite = (productId) => {
+    const isActive = favoriteIds.has(productId)
+    if (isActive) {
+      const next = removeFavorite(productId)
+      setFavoriteIds(new Set(next))
+    } else {
+      const next = addFavorite(productId)
+      setFavoriteIds(new Set(next))
+    }
+  }
 
   const filteredProducts = useMemo(() => {
     const safeMin = Number.isNaN(minPrice) ? 0 : minPrice
@@ -78,6 +95,8 @@ export const Products = () => {
           <ProductGrid
             products={filteredProducts}
             onAddToCart={addToCart}
+            favoriteIds={favoriteIds}
+            onToggleFavorite={toggleFavorite}
             emptyMessage="Nenhum produto cadastrado pelo admin ainda."
           />
         )}

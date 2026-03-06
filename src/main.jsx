@@ -6,6 +6,7 @@ import Layout from './components/Layout'
 import AdminLayout from './components/admin/AdminLayout'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { CartProvider } from './context/CartContext'
+import { AuthProvider } from './context/AuthContext'
 import Dashboard from './pages/admin/Dashboard'
 import Categories from './pages/admin/Categories'
 import Orders from './pages/admin/Orders'
@@ -59,8 +60,12 @@ const router = createBrowserRouter([
         element: <Cart />,
       },
       {
-        path: '/checkout',
+        path: '/endereco',
         element: <Checkout />,
+      },
+      {
+        path: '/checkout',
+        element: <Navigate to="/endereco" replace />,
       },
       {
         path: '/profile',
@@ -114,8 +119,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <CartProvider>
-      <RouterProvider router={router} />
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <RouterProvider router={router} />
+      </CartProvider>
+    </AuthProvider>
   </StrictMode>
 )

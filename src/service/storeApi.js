@@ -9,6 +9,14 @@ const moneyToNumber = (value) => {
   return Number.isNaN(parsed) ? 0 : parsed
 }
 
+const inferCategory = (item) => {
+  const raw = `${item?.categoria || ''} ${item?.nome || ''} ${item?.descricao || ''}`.toLowerCase()
+  if (raw.includes('vaso')) return 'Vasos'
+  if (raw.includes('semente')) return 'Sementes'
+  if (raw.includes('fertiliz')) return 'Fertilizantes'
+  return 'Plantas'
+}
+
 export const normalizeProduct = (item) => ({
   id: item.id,
   name: item.nome || 'Produto sem nome',
@@ -19,6 +27,7 @@ export const normalizeProduct = (item) => ({
   imageUrl: item.imageUrl || fallbackImage,
   images: [item.imageUrl || fallbackImage],
   careLevel: 'Facil',
+  category: inferCategory(item),
   light: 'Conforme orientacao do produtor',
   watering: 'Conforme necessidade da especie',
 })

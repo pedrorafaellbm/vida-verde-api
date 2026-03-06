@@ -1,44 +1,28 @@
 import { useState } from 'react'
-import { api } from '../service/api'
-
-const extractErrorMessage = (error) => {
-  return error?.response?.data?.error || error?.response?.data?.mensagem || 'Nao foi possivel enviar sua mensagem.'
-}
+import { getApiErrorMessage, sendContactRequest } from '../service/api'
 
 export const Contato = () => {
+  const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
-  const [assunto, setAssunto] = useState('')
   const [mensagem, setMensagem] = useState('')
-  const [statusMessage, setStatusMessage] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setStatusMessage('')
+    setSuccessMessage('')
+    setErrorMessage('')
     setIsSubmitting(true)
 
     try {
-      const preferredEndpoint = import.meta.env.VITE_CONTACT_ENDPOINT || '/contato'
-      const fallbackEndpoint = preferredEndpoint === '/contato' ? '/contact' : '/contato'
-      const payload = { email, assunto, mensagem }
-
-      try {
-        await api.post(preferredEndpoint, payload)
-      } catch (firstError) {
-        const status = firstError?.response?.status
-        if (status === 404 || status === 405) {
-          await api.post(fallbackEndpoint, payload)
-        } else {
-          throw firstError
-        }
-      }
-
-      setStatusMessage('Mensagem enviada com sucesso.')
+      await sendContactRequest({ nome, email, mensagem })
+      setSuccessMessage('Mensagem enviada com sucesso.')
+      setNome('')
       setEmail('')
-      setAssunto('')
       setMensagem('')
     } catch (error) {
-      setStatusMessage(extractErrorMessage(error))
+      setErrorMessage(getApiErrorMessage(error, 'Nao foi possivel enviar sua mensagem.'))
     } finally {
       setIsSubmitting(false)
     }
@@ -50,11 +34,11 @@ export const Contato = () => {
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '4px' }}>E-mail</label>
+          <label style={{ display: 'block', marginBottom: '4px' }}>Nome</label>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
             required
             style={{
               width: '100%',
@@ -67,11 +51,11 @@ export const Contato = () => {
         </div>
 
         <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '4px' }}>Assunto</label>
+          <label style={{ display: 'block', marginBottom: '4px' }}>E-mail</label>
           <input
-            type="text"
-            value={assunto}
-            onChange={(e) => setAssunto(e.target.value)}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             style={{
               width: '100%',
@@ -100,7 +84,8 @@ export const Contato = () => {
           />
         </div>
 
-        {statusMessage ? <p style={{ marginTop: 0, marginBottom: '12px' }}>{statusMessage}</p> : null}
+        {successMessage ? <p style={{ marginTop: 0, marginBottom: '12px', color: '#0f8a3b' }}>{successMessage}</p> : null}
+        {errorMessage ? <p style={{ marginTop: 0, marginBottom: '12px', color: '#b00020' }}>{errorMessage}</p> : null}
 
         <button type="submit" disabled={isSubmitting} style={{ padding: '14px 28px', fontSize: '1.1rem' }}>
           {isSubmitting ? 'Enviando...' : 'Enviar'}

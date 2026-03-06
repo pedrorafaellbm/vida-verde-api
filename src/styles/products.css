@@ -108,6 +108,16 @@
   gap: 8px;
 }
 
+.details-favorite {
+  margin-left: 8px;
+}
+
+.details-favorite.active {
+  border-color: #f0b7be;
+  color: #c83a4f;
+  background: #fff1f3;
+}
+
 @media (max-width: 920px) {
   .products-layout {
     grid-template-columns: 1fr;

@@ -1,15 +1,11 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { getUser, isAdmin } from '../service/auth'
+import { useAuth } from '../context/AuthContext'
 import { Navbar } from './NavBar'
-
-const formatUserName = () => {
-  const user = getUser()
-  return user.nome || 'Usuario'
-}
 
 export const Header = () => {
   const { cartItems } = useCart()
+  const { user, isAdmin } = useAuth()
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0)
 
   return (
@@ -20,7 +16,7 @@ export const Header = () => {
         </Link>
 
         <div className="header-actions">
-          <span className="welcome-text">Ola, {formatUserName()}</span>
+          <span className="welcome-text">Ola, {user?.nome || 'Usuario'}</span>
           <NavLink to="/products" className="header-link">
             Produtos
           </NavLink>
@@ -31,7 +27,7 @@ export const Header = () => {
           <NavLink to="/profile" className="header-link">
             Perfil
           </NavLink>
-          {isAdmin() && (
+          {isAdmin && (
             <NavLink to="/admin" className="header-link">
               Admin
             </NavLink>

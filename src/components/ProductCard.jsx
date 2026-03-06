@@ -13,11 +13,19 @@ const careClassByLevel = {
   'Difícil': 'care-hard',
 }
 
-export const ProductCard = ({ product, onAddToCart }) => {
+export const ProductCard = ({ product, onAddToCart, isFavorited, onToggleFavorite }) => {
   const imageSrc = product.imageUrl || product.image
 
   return (
     <article className="product-card">
+      <button
+        type="button"
+        className={`favorite-btn ${isFavorited ? 'active' : ''}`}
+        onClick={() => onToggleFavorite?.(product.id)}
+        aria-label={isFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+      >
+        ❤
+      </button>
       <Link to={`/products/${product.id}`} className="product-image-wrap">
         <img src={imageSrc} alt={product.name} className="product-image" loading="lazy" />
       </Link>

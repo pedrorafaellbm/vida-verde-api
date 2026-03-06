@@ -10,8 +10,8 @@ export const Navbar = () => {
         <NavLink to="/products" className="nav-item">
           Catálogo
         </NavLink>
-        <NavLink to="/checkout" className="nav-item">
-          Checkout
+        <NavLink to="/endereco" className="nav-item">
+          Endereço
         </NavLink>
         <NavLink to="/contato" className="nav-item">
           Contato

@@ -60,8 +60,8 @@ export const Cart = () => {
               <strong>{formatPrice(total)}</strong>
             </div>
 
-            <Link to="/checkout" className="btn checkout-link">
-              Ir para checkout
+            <Link to="/endereco" className="btn checkout-link">
+              Ir para endereco
             </Link>
           </aside>
         </div>

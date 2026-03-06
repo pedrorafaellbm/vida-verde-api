@@ -1,25 +1,27 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import '../styles/checkout.css'
 
-const formatPrice = (price) => {
-  return new Intl.NumberFormat('pt-BR', {
+const formatPrice = (price) =>
+  new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
   }).format(price)
-}
 
 export const Checkout = () => {
   const navigate = useNavigate()
-  const { cartItems, calculateTotal, clearCart } = useCart()
+  const { cartItems, calculateTotal } = useCart()
 
   const [form, setForm] = useState({
-    fullName: '',
+    nome: '',
     cep: '',
-    city: '',
-    address: '',
-    payment: 'cartao',
+    estado: '',
+    cidade: '',
+    bairro: '',
+    rua: '',
+    numero: '',
+    complemento: '',
   })
 
   const subtotal = calculateTotal()
@@ -33,69 +35,66 @@ export const Checkout = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    if (!cartItems.length) return
-
-    alert('Pedido finalizado com sucesso!')
-    clearCart()
-    navigate('/home')
+    localStorage.setItem('shippingAddress', JSON.stringify(form))
+    alert('Endereco salvo com sucesso!')
+    navigate('/cart')
   }
 
   return (
     <section className="checkout-page">
-      <h1>Checkout</h1>
+      <h1>Endereço</h1>
 
       <div className="checkout-layout">
         <form className="checkout-form" onSubmit={handleSubmit}>
-          <h2>Endereço de entrega</h2>
+          <h2>Dados de entrega</h2>
 
-          <label htmlFor="fullName">Nome completo</label>
-          <input id="fullName" name="fullName" value={form.fullName} onChange={handleChange} required />
+          <label htmlFor="nome">Nome</label>
+          <input id="nome" name="nome" value={form.nome} onChange={handleChange} required />
 
-          <label htmlFor="cep">CEP</label>
-          <input id="cep" name="cep" value={form.cep} onChange={handleChange} required />
-
-          <label htmlFor="city">Cidade</label>
-          <input id="city" name="city" value={form.city} onChange={handleChange} required />
-
-          <label htmlFor="address">Endereço</label>
-          <input id="address" name="address" value={form.address} onChange={handleChange} required />
-
-          <h2>Pagamento</h2>
-          <div className="payment-options">
-            <label>
-              <input
-                type="radio"
-                name="payment"
-                value="cartao"
-                checked={form.payment === 'cartao'}
-                onChange={handleChange}
-              />
-              Cartão de crédito
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="payment"
-                value="pix"
-                checked={form.payment === 'pix'}
-                onChange={handleChange}
-              />
-              Pix
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="payment"
-                value="boleto"
-                checked={form.payment === 'boleto'}
-                onChange={handleChange}
-              />
-              Boleto
-            </label>
+          <div className="address-row">
+            <div>
+              <label htmlFor="cep">CEP</label>
+              <input id="cep" name="cep" value={form.cep} onChange={handleChange} required />
+            </div>
+            <div>
+              <label htmlFor="estado">Estado</label>
+              <input id="estado" name="estado" value={form.estado} onChange={handleChange} required />
+            </div>
           </div>
 
-          <button type="submit" className="btn" disabled={!cartItems.length}>
-            Finalizar pedido
+          <div className="address-row">
+            <div>
+              <label htmlFor="cidade">Cidade</label>
+              <input id="cidade" name="cidade" value={form.cidade} onChange={handleChange} required />
+            </div>
+            <div>
+              <label htmlFor="bairro">Bairro</label>
+              <input id="bairro" name="bairro" value={form.bairro} onChange={handleChange} required />
+            </div>
+          </div>
+
+          <label htmlFor="rua">Rua</label>
+          <input id="rua" name="rua" value={form.rua} onChange={handleChange} required />
+
+          <div className="address-row">
+            <div>
+              <label htmlFor="numero">Numero</label>
+              <input id="numero" name="numero" value={form.numero} onChange={handleChange} required />
+            </div>
+            <div>
+              <label htmlFor="complemento">Complemento</label>
+              <input
+                id="complemento"
+                name="complemento"
+                value={form.complemento}
+                onChange={handleChange}
+                placeholder="Apto, bloco, referencia"
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="btn">
+            Salvar endereço
           </button>
         </form>
 

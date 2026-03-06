@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom'
-import { clearAuthSession, getUser } from '../../service/auth'
+import { useAuth } from '../../context/AuthContext'
 
 export function Topbar() {
   const navigate = useNavigate()
-  const user = getUser()
+  const { user, signOut } = useAuth()
 
   const handleLogout = () => {
-    clearAuthSession()
+    signOut()
     navigate('/login')
   }
 
