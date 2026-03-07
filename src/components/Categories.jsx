@@ -1,6 +1,4 @@
-const categories = ['Todas', 'Plantas', 'Vasos', 'Sementes', 'Fertilizantes']
-
-export const Categories = ({ selected = 'Todas', onChange }) => {
+export const Categories = ({ categories = ['Todas'], selected = 'Todas', onChange }) => {
   return (
     <div className="categories-bar" role="tablist" aria-label="Categorias de produtos">
       {categories.map((category) => (

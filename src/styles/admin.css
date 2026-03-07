@@ -218,7 +218,8 @@
   margin-bottom: 16px;
 }
 
-.admin-form input {
+.admin-form input,
+.admin-form select {
   min-width: 220px;
   padding: 9px 10px;
   border-radius: 10px;

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { ConfirmModal } from '../../components/admin/ConfirmModal'
 import { DataTable } from '../../components/admin/DataTable'
-
-const mockCategories = [
-  { id: 'c1', nome: 'Folhagens', descricao: 'Plantas para ambientes internos' },
-  { id: 'c2', nome: 'Flores', descricao: 'Plantas floridas e ornamentais' },
-  { id: 'c3', nome: 'Suculentas', descricao: 'Facil cuidado e pouca rega' },
-]
+import {
+  createCategory,
+  deleteCategory,
+  getErrorMessage,
+  listCategories,
+  updateCategory,
+} from '../../service/adminApi'
 
 export default function Categories() {
   const [categories, setCategories] = useState([])
@@ -14,62 +15,86 @@ export default function Categories() {
   const [description, setDescription] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState(null)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  const loadCategories = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const data = await listCategories()
+      setCategories(data)
+    } catch (err) {
+      setError(getErrorMessage(err, 'Nao foi possivel carregar categorias.'))
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    setCategories(mockCategories)
+    loadCategories()
   }, [])
 
   const resetForm = () => {
     setName('')
     setDescription('')
     setEditingId(null)
+    setError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!name.trim()) return
+    const normalizedName = name.trim()
+    if (!normalizedName) return
 
-    if (editingId) {
-      setCategories((prev) =>
-        prev.map((category) =>
-          category.id === editingId
-            ? { ...category, nome: name.trim(), descricao: description.trim() }
-            : category
-        )
-      )
+    try {
+      if (editingId) {
+        await updateCategory(editingId, {
+          name: normalizedName,
+          description: description.trim(),
+        })
+      } else {
+        await createCategory({
+          name: normalizedName,
+          description: description.trim(),
+        })
+      }
+
+      await loadCategories()
       resetForm()
-      return
+    } catch (err) {
+      setError(getErrorMessage(err, 'Nao foi possivel salvar a categoria.'))
     }
-
-    setCategories((prev) => [
-      ...prev,
-      {
-        id: `c${Date.now()}`,
-        nome: name.trim(),
-        descricao: description.trim(),
-      },
-    ])
-    resetForm()
   }
 
   const startEdit = (category) => {
     setEditingId(category.id)
-    setName(category.nome)
-    setDescription(category.descricao)
+    setName(category.name || '')
+    setDescription(category.description || '')
+    setError('')
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!selectedCategory) return
-    setCategories((prev) => prev.filter((category) => category.id !== selectedCategory.id))
-    setSelectedCategory(null)
-    if (editingId === selectedCategory.id) {
-      resetForm()
+    try {
+      await deleteCategory(selectedCategory.id)
+      setSelectedCategory(null)
+      if (editingId === selectedCategory.id) {
+        resetForm()
+      }
+      await loadCategories()
+    } catch (err) {
+      setError(getErrorMessage(err, 'Nao foi possivel excluir a categoria.'))
     }
   }
 
   const columns = [
-    { key: 'nome', header: 'Nome' },
-    { key: 'descricao', header: 'Descricao' },
+    { key: 'name', header: 'Nome' },
+    {
+      key: 'description',
+      header: 'Descricao',
+      render: (row) => row.description || '-',
+    },
     {
       key: 'acoes',
       header: 'Acoes',
@@ -115,12 +140,18 @@ export default function Categories() {
         )}
       </form>
 
-      <DataTable columns={columns} data={categories} emptyText="Nenhuma categoria cadastrada." />
+      {error && <p className="admin-error">{error}</p>}
+
+      {loading ? (
+        <div className="admin-empty">Carregando categorias...</div>
+      ) : (
+        <DataTable columns={columns} data={categories} emptyText="Nenhuma categoria cadastrada." />
+      )}
 
       <ConfirmModal
         open={Boolean(selectedCategory)}
         title="Excluir categoria"
-        message={`Deseja remover "${selectedCategory?.nome}"?`}
+        message={`Deseja remover "${selectedCategory?.name}"?`}
         onConfirm={handleDelete}
         onCancel={() => setSelectedCategory(null)}
       />

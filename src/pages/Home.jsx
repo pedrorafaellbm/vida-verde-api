@@ -4,6 +4,7 @@ import { Banner } from '../components/Banner'
 import { Categories } from '../components/Categories'
 import { ProductGrid } from '../components/ProductGrid'
 import { useCart } from '../context/CartContext'
+import { listCategories } from '../service/adminApi'
 import { getStoreProducts } from '../service/storeApi'
 import { addFavorite, getFavorites, removeFavorite } from '../utils/favorites'
 import '../styles/home.css'
@@ -11,6 +12,7 @@ import '../styles/home.css'
 export const Home = () => {
   const { addToCart } = useCart()
   const [products, setProducts] = useState([])
+  const [categoryOptions, setCategoryOptions] = useState(['Todas'])
   const [selectedCategory, setSelectedCategory] = useState('Todas')
   const [favoriteIds, setFavoriteIds] = useState(new Set())
   const [loading, setLoading] = useState(true)
@@ -21,8 +23,12 @@ export const Home = () => {
       setLoading(true)
       setError('')
       try {
-        const data = await getStoreProducts()
-        setProducts(data)
+        const [productsData, categoriesData] = await Promise.all([
+          getStoreProducts(),
+          listCategories(),
+        ])
+        setProducts(productsData)
+        setCategoryOptions(['Todas', ...categoriesData.map((item) => item.name)])
       } catch {
         setError('Nao foi possivel carregar os produtos.')
       } finally {
@@ -64,7 +70,11 @@ export const Home = () => {
           <h2>Categorias</h2>
           <p>Filtre os produtos com um clique</p>
         </div>
-        <Categories selected={selectedCategory} onChange={setSelectedCategory} />
+        <Categories
+          categories={categoryOptions}
+          selected={selectedCategory}
+          onChange={setSelectedCategory}
+        />
       </section>
 
       <div className="home-highlight">

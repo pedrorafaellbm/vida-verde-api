@@ -10,11 +10,9 @@ const moneyToNumber = (value) => {
 }
 
 const inferCategory = (item) => {
-  const raw = `${item?.categoria || ''} ${item?.nome || ''} ${item?.descricao || ''}`.toLowerCase()
-  if (raw.includes('vaso')) return 'Vasos'
-  if (raw.includes('semente')) return 'Sementes'
-  if (raw.includes('fertiliz')) return 'Fertilizantes'
-  return 'Plantas'
+  if (item?.category?.name) return item.category.name
+  if (item?.categoria) return item.categoria
+  return 'Sem categoria'
 }
 
 export const normalizeProduct = (item) => ({

@@ -5,12 +5,14 @@ import {
   createProduct,
   deleteProduct,
   getErrorMessage,
+  listCategories,
   listProducts,
   updateProduct,
 } from '../../service/adminApi'
 
 const defaultForm = {
   nome: '',
+  categoria: '',
   preco: '',
   estoque: '',
   descricao: '',
@@ -22,6 +24,7 @@ const toMoney = (value) =>
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -29,21 +32,22 @@ export default function AdminProducts() {
   const [form, setForm] = useState(defaultForm)
   const [editingId, setEditingId] = useState(null)
 
-  const loadProducts = async () => {
+  const loadData = async () => {
     setLoading(true)
     setError('')
     try {
-      const data = await listProducts()
-      setProducts(data)
+      const [productsData, categoriesData] = await Promise.all([listProducts(), listCategories()])
+      setProducts(productsData)
+      setCategories(categoriesData)
     } catch (err) {
-      setError(getErrorMessage(err, 'Nao foi possivel carregar os produtos.'))
+      setError(getErrorMessage(err, 'Nao foi possivel carregar os dados de produtos.'))
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    loadProducts()
+    loadData()
   }, [])
 
   const resetForm = () => {
@@ -55,10 +59,13 @@ export default function AdminProducts() {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
+  const resolveCategoryName = (product) => product?.category?.name || product?.categoria || ''
+
   const handleEdit = (product) => {
     setEditingId(product.id)
     setForm({
       nome: product.nome || '',
+      categoria: resolveCategoryName(product),
       preco: String(product.preco ?? ''),
       estoque: String(product.estoque ?? ''),
       descricao: product.descricao || '',
@@ -73,6 +80,7 @@ export default function AdminProducts() {
 
     const payload = {
       nome: form.nome.trim(),
+      categoria: form.categoria,
       preco: Number(form.preco),
       estoque: Number(form.estoque),
       descricao: form.descricao.trim(),
@@ -85,7 +93,8 @@ export default function AdminProducts() {
       } else {
         await createProduct(payload)
       }
-      await loadProducts()
+
+      await loadData()
       resetForm()
     } catch (err) {
       setError(getErrorMessage(err, 'Nao foi possivel salvar o produto.'))
@@ -98,8 +107,8 @@ export default function AdminProducts() {
     if (!selectedProduct) return
     try {
       await deleteProduct(selectedProduct.id)
-      setProducts((prev) => prev.filter((item) => item.id !== selectedProduct.id))
       setSelectedProduct(null)
+      await loadData()
     } catch (err) {
       setError(getErrorMessage(err, 'Nao foi possivel excluir o produto.'))
     }
@@ -117,6 +126,11 @@ export default function AdminProducts() {
         ),
     },
     { key: 'nome', header: 'Produto' },
+    {
+      key: 'categoria',
+      header: 'Categoria',
+      render: (row) => resolveCategoryName(row) || <span className="role-chip">sem categoria</span>,
+    },
     { key: 'preco', header: 'Preco', render: (row) => toMoney(row.preco) },
     { key: 'estoque', header: 'Estoque' },
     {
@@ -148,6 +162,18 @@ export default function AdminProducts() {
           placeholder="Nome"
           required
         />
+        <select
+          value={form.categoria}
+          onChange={(e) => onChange('categoria', e.target.value)}
+          disabled={!categories.length}
+        >
+          <option value="">Selecione uma categoria</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.name}>
+              {category.name}
+            </option>
+          ))}
+        </select>
         <input
           type="number"
           min="0"
@@ -185,6 +211,10 @@ export default function AdminProducts() {
           </button>
         )}
       </form>
+
+      {!categories.length && (
+        <p className="admin-error">Crie ao menos uma categoria antes de associar produtos.</p>
+      )}
 
       {error && <p className="admin-error">{error}</p>}
 

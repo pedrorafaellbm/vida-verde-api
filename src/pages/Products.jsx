@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { FilterSidebar } from '../components/FilterSidebar'
 import { ProductGrid } from '../components/ProductGrid'
 import { useCart } from '../context/CartContext'
+import { listCategories } from '../service/adminApi'
 import { getStoreProducts } from '../service/storeApi'
 import { addFavorite, getFavorites, removeFavorite } from '../utils/favorites'
 import '../styles/products.css'
@@ -12,25 +13,31 @@ export const Products = () => {
   const [favoriteIds, setFavoriteIds] = useState(new Set())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [categoryOptions, setCategoryOptions] = useState(['Todas'])
+  const [minPrice, setMinPrice] = useState(0)
+  const [maxPrice, setMaxPrice] = useState(0)
+  const [selectedCategory, setSelectedCategory] = useState('Todas')
+  const [sortBy, setSortBy] = useState('asc')
 
   const highestPrice = useMemo(() => {
     if (!products.length) return 0
     return Math.ceil(Math.max(...products.map((plant) => plant.price)))
   }, [products])
 
-  const [minPrice, setMinPrice] = useState(0)
-  const [maxPrice, setMaxPrice] = useState(0)
-  const [careLevel, setCareLevel] = useState('Todos')
-  const [sortBy, setSortBy] = useState('asc')
-
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true)
       setError('')
       try {
-        const data = await getStoreProducts()
-        setProducts(data)
-        const max = data.length ? Math.ceil(Math.max(...data.map((item) => item.price))) : 0
+        const [productsData, categoriesData] = await Promise.all([
+          getStoreProducts(),
+          listCategories(),
+        ])
+        setProducts(productsData)
+        setCategoryOptions(['Todas', ...categoriesData.map((item) => item.name)])
+        const max = productsData.length
+          ? Math.ceil(Math.max(...productsData.map((item) => item.price)))
+          : 0
         setMaxPrice(max)
       } catch {
         setError('Nao foi possivel carregar o catalogo.')
@@ -62,10 +69,10 @@ export const Products = () => {
     const safeMax = Number.isNaN(maxPrice) ? highestPrice : maxPrice
 
     return [...products]
-      .filter((plant) => plant.price >= safeMin && plant.price <= safeMax)
-      .filter((plant) => careLevel === 'Todos' || plant.careLevel === careLevel)
+      .filter((product) => product.price >= safeMin && product.price <= safeMax)
+      .filter((product) => selectedCategory === 'Todas' || product.category === selectedCategory)
       .sort((a, b) => (sortBy === 'asc' ? a.price - b.price : b.price - a.price))
-  }, [careLevel, highestPrice, maxPrice, minPrice, products, sortBy])
+  }, [highestPrice, maxPrice, minPrice, products, selectedCategory, sortBy])
 
   return (
     <section className="products-page">
@@ -80,12 +87,13 @@ export const Products = () => {
         <FilterSidebar
           minPrice={minPrice}
           maxPrice={maxPrice}
-          careLevel={careLevel}
+          selectedCategory={selectedCategory}
           sortBy={sortBy}
           highestPrice={highestPrice}
+          categories={categoryOptions}
           onMinPriceChange={setMinPrice}
           onMaxPriceChange={setMaxPrice}
-          onCareLevelChange={setCareLevel}
+          onCategoryChange={setSelectedCategory}
           onSortByChange={setSortBy}
         />
 

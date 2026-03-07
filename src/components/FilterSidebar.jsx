@@ -1,19 +1,20 @@
-﻿export const FilterSidebar = ({
+export const FilterSidebar = ({
   minPrice,
   maxPrice,
-  careLevel,
+  selectedCategory,
   sortBy,
   onMinPriceChange,
   onMaxPriceChange,
-  onCareLevelChange,
+  onCategoryChange,
   onSortByChange,
   highestPrice,
+  categories = [],
 }) => {
   return (
     <aside className="filter-sidebar">
       <h3>Filtros</h3>
 
-      <label htmlFor="min-price">Preço mínimo</label>
+      <label htmlFor="min-price">Preco minimo</label>
       <input
         id="min-price"
         type="number"
@@ -22,7 +23,7 @@
         onChange={(event) => onMinPriceChange(Number(event.target.value))}
       />
 
-      <label htmlFor="max-price">Preço máximo</label>
+      <label htmlFor="max-price">Preco maximo</label>
       <input
         id="max-price"
         type="number"
@@ -32,19 +33,20 @@
         onChange={(event) => onMaxPriceChange(Number(event.target.value))}
       />
 
-      <label htmlFor="care-level">Nível de cuidado</label>
+      <label htmlFor="category">Categoria</label>
       <select
-        id="care-level"
-        value={careLevel}
-        onChange={(event) => onCareLevelChange(event.target.value)}
+        id="category"
+        value={selectedCategory}
+        onChange={(event) => onCategoryChange(event.target.value)}
       >
-        <option value="Todos">Todos</option>
-        <option value="Fácil">Fácil</option>
-        <option value="Médio">Médio</option>
-        <option value="Difícil">Difícil</option>
+        {categories.map((category) => (
+          <option key={category} value={category}>
+            {category}
+          </option>
+        ))}
       </select>
 
-      <label htmlFor="sort-price">Ordenar por preço</label>
+      <label htmlFor="sort-price">Ordenar por preco</label>
       <select id="sort-price" value={sortBy} onChange={(event) => onSortByChange(event.target.value)}>
         <option value="asc">Menor para maior</option>
         <option value="desc">Maior para menor</option>
