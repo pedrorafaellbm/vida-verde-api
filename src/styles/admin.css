@@ -226,6 +226,28 @@
   border: 1px solid #c5d6cc;
 }
 
+.admin-form textarea {
+  min-width: 220px;
+  min-height: 120px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid #c5d6cc;
+  resize: vertical;
+}
+
+.admin-form-stacked {
+  display: grid;
+}
+
+.admin-success {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #bfdfc9;
+  background: #f2fbf4;
+  color: #23623b;
+}
+
 .admin-product-thumb {
   width: 56px;
   height: 56px;

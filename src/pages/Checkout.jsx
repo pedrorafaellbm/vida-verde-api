@@ -37,12 +37,12 @@ export const Checkout = () => {
     event.preventDefault()
     localStorage.setItem('shippingAddress', JSON.stringify(form))
     alert('Endereco salvo com sucesso!')
-    navigate('/cart')
+    navigate('/carrinho')
   }
 
   return (
     <section className="checkout-page">
-      <h1>Endereço</h1>
+      <h1>Endereco</h1>
 
       <div className="checkout-layout">
         <form className="checkout-form" onSubmit={handleSubmit}>
@@ -94,7 +94,7 @@ export const Checkout = () => {
           </div>
 
           <button type="submit" className="btn">
-            Salvar endereço
+            Salvar endereco
           </button>
         </form>
 

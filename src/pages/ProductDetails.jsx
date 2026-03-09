@@ -5,12 +5,11 @@ import { getStoreProductById } from '../service/storeApi'
 import { addFavorite, isFavorite, removeFavorite } from '../utils/favorites'
 import '../styles/products.css'
 
-const formatPrice = (price) => {
-  return new Intl.NumberFormat('pt-BR', {
+const formatPrice = (price) =>
+  new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
   }).format(price)
-}
 
 export const ProductDetails = () => {
   const { id } = useParams()
@@ -25,6 +24,7 @@ export const ProductDetails = () => {
     const loadProduct = async () => {
       setLoading(true)
       setError('')
+
       try {
         const data = await getStoreProductById(id)
         setProduct(data)
@@ -51,13 +51,15 @@ export const ProductDetails = () => {
 
   const handleToggleFavorite = () => {
     if (!product) return
+
     if (favorited) {
       removeFavorite(product.id)
       setFavorited(false)
-    } else {
-      addFavorite(product.id)
-      setFavorited(true)
+      return
     }
+
+    addFavorite(product.id)
+    setFavorited(true)
   }
 
   if (!product) {
@@ -107,16 +109,18 @@ export const ProductDetails = () => {
             </li>
           </ul>
 
-          <button type="button" className="btn" onClick={() => addToCart(product)}>
-            Adicionar ao carrinho
-          </button>
-          <button
-            type="button"
-            className={`btn btn-secondary details-favorite ${favorited ? 'active' : ''}`}
-            onClick={handleToggleFavorite}
-          >
-            {favorited ? '❤ Curtido' : '♡ Curtir'}
-          </button>
+          <div className="details-action-row">
+            <button type="button" className="btn" onClick={() => addToCart(product)}>
+              Adicionar ao carrinho
+            </button>
+            <button
+              type="button"
+              className={`btn btn-secondary details-favorite ${favorited ? 'active' : ''}`}
+              onClick={handleToggleFavorite}
+            >
+              {favorited ? 'Curtido' : 'Curtir'}
+            </button>
+          </div>
         </div>
       </div>
     </section>

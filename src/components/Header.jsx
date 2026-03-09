@@ -11,27 +11,27 @@ export const Header = () => {
   return (
     <header className="site-header">
       <div className="container header-top">
-        <Link to="/home" className="logo-link">
-          GreenStore
+        <Link to="/inicio" className="logo-link">
+          Vida Verde
         </Link>
 
         <div className="header-actions">
-          <span className="welcome-text">Ola, {user?.nome || 'Usuario'}</span>
-          <NavLink to="/products" className="header-link">
-            Produtos
+          <span className="welcome-text">Ola, {user?.nome || 'Visitante'}</span>
+          <NavLink to="/curtidos" className="header-link">
+            Curtidos
           </NavLink>
-          <NavLink to="/cart" className="header-link cart-link">
+          <NavLink to="/carrinho" className="header-link cart-link">
             Carrinho
             <span className="cart-badge">{cartCount}</span>
           </NavLink>
-          <NavLink to="/profile" className="header-link">
+          <NavLink to="/perfil" className="header-link">
             Perfil
           </NavLink>
-          {isAdmin && (
+          {isAdmin ? (
             <NavLink to="/admin" className="header-link">
-              Admin
+              Painel
             </NavLink>
-          )}
+          ) : null}
         </div>
       </div>
       <Navbar />

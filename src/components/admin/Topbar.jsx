@@ -18,8 +18,8 @@ export function Topbar() {
       </div>
 
       <div className="admin-topbar-actions">
-        <span className="admin-user">Admin: {user.nome || 'Usuario'}</span>
-        <button type="button" className="btn btn-secondary" onClick={() => navigate('/home')}>
+        <span className="admin-user">Usuario: {user.nome || 'Usuario'}</span>
+        <button type="button" className="btn btn-secondary" onClick={() => navigate('/inicio')}>
           Ver Loja
         </button>
         <button type="button" className="btn" onClick={handleLogout}>

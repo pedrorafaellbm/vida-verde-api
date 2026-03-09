@@ -63,6 +63,21 @@ export const sendContactRequest = async (payload) => {
   return response.data
 }
 
+export const listFavoritesRequest = async () => {
+  const response = await api.get('/favorites')
+  return response.data?.data || []
+}
+
+export const addFavoriteRequest = async (productId) => {
+  const response = await api.post(`/favorites/${productId}`)
+  return response.data
+}
+
+export const removeFavoriteRequest = async (productId) => {
+  const response = await api.delete(`/favorites/${productId}`)
+  return response.data
+}
+
 export const listFavoritosRequest = async () => {
   const response = await api.get('/favoritos')
   return response.data?.data || []
@@ -81,4 +96,19 @@ export const removeFavoritoRequest = async (produtoId) => {
 export const deleteUsuarioRequest = async (id) => {
   const response = await api.delete(`/usuarios/${id}`)
   return response.data
+}
+
+export const listBannersRequest = async () => {
+  const response = await api.get('/banners')
+  return response.data?.data || []
+}
+
+export const listStoreInfoRequest = async () => {
+  const response = await api.get('/store-info')
+  return response.data?.data || response.data
+}
+
+export const listFeaturedProductsRequest = async () => {
+  const response = await api.get('/products/featured')
+  return response.data?.data || []
 }

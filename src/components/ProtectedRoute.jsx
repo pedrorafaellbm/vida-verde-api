@@ -14,7 +14,7 @@ export const ProtectedRoute = ({ children, requireAdmin = false }) => {
   }
 
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/home" replace />
+    return <Navigate to="/inicio" replace />
   }
 
   return children

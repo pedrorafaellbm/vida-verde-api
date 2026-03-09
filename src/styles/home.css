@@ -115,6 +115,7 @@
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 20px;
+  box-shadow: var(--shadow-soft);
 }
 
 .categories-bar {
@@ -140,6 +141,10 @@
   border-color: #b6d7c4;
 }
 
+.category-chip:hover {
+  background: var(--green-050);
+}
+
 .see-all-link {
   color: var(--green-800);
   font-weight: 700;
@@ -152,6 +157,7 @@
   padding: 22px;
   display: grid;
   gap: 14px;
+  box-shadow: var(--shadow-soft);
 }
 
 .about-store h2 {

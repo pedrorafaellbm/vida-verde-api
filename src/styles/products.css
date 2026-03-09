@@ -118,6 +118,12 @@
   background: #fff1f3;
 }
 
+.details-action-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 920px) {
   .products-layout {
     grid-template-columns: 1fr;

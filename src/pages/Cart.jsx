@@ -20,7 +20,7 @@ export const Cart = () => {
   return (
     <section className="cart-page">
       <div className="section-header">
-        <h1>Seu carrinho</h1>
+        <h1>Seu Carrinho</h1>
         <p>{cartItems.length} itens</p>
       </div>
 
@@ -61,7 +61,7 @@ export const Cart = () => {
             </div>
 
             <Link to="/endereco" className="btn checkout-link">
-              Ir para endereco
+              Ir para Endereco
             </Link>
           </aside>
         </div>

@@ -1,17 +1,19 @@
 import { NavLink } from 'react-router-dom'
 
 const items = [
-  { to: '/admin', label: 'Dashboard', end: true },
+  { to: '/admin', label: 'Visao geral', end: true },
   { to: '/admin/products', label: 'Produtos' },
   { to: '/admin/orders', label: 'Pedidos' },
   { to: '/admin/users', label: 'Usuarios' },
   { to: '/admin/categories', label: 'Categorias' },
+  { to: '/admin/banners', label: 'Banners' },
+  { to: '/admin/store-info', label: 'Sobre a Loja' },
 ]
 
 export function Sidebar() {
   return (
     <aside className="admin-sidebar">
-      <div className="admin-brand">Vida Verde Admin</div>
+      <div className="admin-brand">Vida Verde Painel</div>
       <nav className="admin-nav">
         {items.map((item) => (
           <NavLink

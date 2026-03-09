@@ -37,7 +37,7 @@ export default function Dashboard() {
   return (
     <section>
       <div className="admin-section-header">
-        <h2>Dashboard</h2>
+        <h2>Visao Geral</h2>
         <p>Visao geral da operacao</p>
       </div>
 

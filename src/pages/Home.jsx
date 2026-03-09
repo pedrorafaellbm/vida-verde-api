@@ -1,109 +1,121 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Banner } from '../components/Banner'
+import { BannerCarousel } from '../components/BannerCarousel'
 import { Categories } from '../components/Categories'
 import { ProductGrid } from '../components/ProductGrid'
 import { useCart } from '../context/CartContext'
 import { listCategories } from '../service/adminApi'
-import { getStoreProducts } from '../service/storeApi'
+import {
+  getFeaturedProducts,
+  getStoreBanners,
+  getStoreInfo,
+  getStoreProducts,
+} from '../service/storeApi'
 import { addFavorite, getFavorites, removeFavorite } from '../utils/favorites'
 import '../styles/home.css'
 
 export const Home = () => {
   const { addToCart } = useCart()
   const [products, setProducts] = useState([])
-  const [categoryOptions, setCategoryOptions] = useState(['Todas'])
+  const [featuredProducts, setFeaturedProducts] = useState([])
+  const [categories, setCategories] = useState(['Todas'])
   const [selectedCategory, setSelectedCategory] = useState('Todas')
   const [favoriteIds, setFavoriteIds] = useState(new Set())
+  const [banners, setBanners] = useState([])
+  const [storeInfo, setStoreInfo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadHomeData = async () => {
       setLoading(true)
       setError('')
       try {
-        const [productsData, categoriesData] = await Promise.all([
-          getStoreProducts(),
-          listCategories(),
-        ])
+        const [productsData, featuredData, categoriesData, bannersData, storeInfoData] =
+          await Promise.all([
+            getStoreProducts(),
+            getFeaturedProducts(),
+            listCategories(),
+            getStoreBanners(),
+            getStoreInfo(),
+          ])
+
         setProducts(productsData)
-        setCategoryOptions(['Todas', ...categoriesData.map((item) => item.name)])
+        setFeaturedProducts(featuredData)
+        setCategories(['Todas', ...categoriesData.map((item) => item.name)])
+        setBanners(bannersData)
+        setStoreInfo(storeInfoData)
       } catch {
-        setError('Nao foi possivel carregar os produtos.')
+        setError('Nao foi possivel carregar a pagina inicial.')
       } finally {
+        setFavoriteIds(new Set(getFavorites()))
         setLoading(false)
       }
     }
 
-    loadProducts()
+    loadHomeData()
   }, [])
 
-  useEffect(() => {
-    setFavoriteIds(new Set(getFavorites()))
-  }, [])
-
-  const toggleFavorite = async (productId) => {
-    const isActive = favoriteIds.has(productId)
-    if (isActive) {
-      const next = removeFavorite(productId)
-      setFavoriteIds(new Set(next))
-    } else {
-      const next = addFavorite(productId)
-      setFavoriteIds(new Set(next))
+  const toggleFavorite = (productId) => {
+    if (favoriteIds.has(productId)) {
+      setFavoriteIds(new Set(removeFavorite(productId)))
+      return
     }
+
+    setFavoriteIds(new Set(addFavorite(productId)))
   }
 
-  const filteredProducts = useMemo(() => {
-    if (selectedCategory === 'Todas') return products
-    return products.filter((item) => item.category === selectedCategory)
-  }, [products, selectedCategory])
-
-  const featuredProducts = useMemo(() => filteredProducts.slice(0, 4), [filteredProducts])
+  const allProducts =
+    selectedCategory === 'Todas'
+      ? products
+      : products.filter((product) => product.category === selectedCategory)
 
   return (
     <section className="home-page">
-      <Banner />
+      <BannerCarousel banners={banners} />
 
       <section className="home-categories">
         <div className="section-header">
           <h2>Categorias</h2>
-          <p>Filtre os produtos com um clique</p>
+          <p>Navegue pelos tipos de produto com um clique.</p>
         </div>
-        <Categories
-          categories={categoryOptions}
-          selected={selectedCategory}
-          onChange={setSelectedCategory}
-        />
+        <Categories categories={categories} selected={selectedCategory} onChange={setSelectedCategory} />
       </section>
 
-      <div className="home-highlight">
+      <section className="home-highlight">
         <div className="section-header">
-          <h2>Produtos em destaque</h2>
-          <Link to="/products" className="see-all-link">
-            Ver catalogo completo
+          <div>
+            <h2>Produtos em Destaque</h2>
+            <p>Selecao especial para decorar, presentear e renovar ambientes.</p>
+          </div>
+          <Link to="/destaques" className="see-all-link">
+            Ver todos os destaques
           </Link>
         </div>
 
-        {error && <p className="empty-state">{error}</p>}
+        {error ? <p className="empty-state">{error}</p> : null}
+
         {loading ? (
-          <p className="empty-state">Carregando produtos...</p>
+          <p className="empty-state">Carregando destaques...</p>
         ) : (
           <ProductGrid
             products={featuredProducts}
             onAddToCart={addToCart}
             favoriteIds={favoriteIds}
             onToggleFavorite={toggleFavorite}
-            emptyMessage="Nenhum produto cadastrado pelo admin ainda."
+            emptyMessage="Nenhum produto em destaque no momento."
           />
         )}
-      </div>
+      </section>
 
       <section className="home-highlight">
         <div className="section-header">
-          <h2>Todos os produtos</h2>
+          <div>
+            <h2>Todos os Produtos</h2>
+            <p>Catalogo completo com curadoria e visual consistente.</p>
+          </div>
           <Link to="/products" className="see-all-link">
-            Ir para pagina de produtos
+            Abrir catalogo
           </Link>
         </div>
 
@@ -111,7 +123,7 @@ export const Home = () => {
           <p className="empty-state">Carregando produtos...</p>
         ) : (
           <ProductGrid
-            products={filteredProducts}
+            products={allProducts}
             onAddToCart={addToCart}
             favoriteIds={favoriteIds}
             onToggleFavorite={toggleFavorite}
@@ -121,23 +133,25 @@ export const Home = () => {
       </section>
 
       <section className="about-store">
-        <h2>Sobre a Loja</h2>
-        <p>
-          Somos uma loja dedicada ao cultivo e venda de plantas de qualidade, com foco em
-          praticidade para quem quer deixar a casa mais viva.
-        </p>
+        <div className="section-header">
+          <div>
+            <h2>{storeInfo?.title || 'Sobre a Loja'}</h2>
+            <p>{storeInfo?.description || 'Conheca mais sobre nossa curadoria e atendimento.'}</p>
+          </div>
+        </div>
+
         <div className="about-grid">
           <article>
             <h3>Missao</h3>
-            <p>Conectar pessoas a natureza com produtos selecionados e suporte simples.</p>
+            <p>{storeInfo?.mission || 'Conectar pessoas a natureza com uma compra simples e segura.'}</p>
           </article>
           <article>
             <h3>Qualidade</h3>
-            <p>Cada item e escolhido para garantir boa adaptacao e otimo acabamento.</p>
+            <p>{storeInfo?.quality || 'Produtos escolhidos com foco em saude, beleza e boa apresentacao.'}</p>
           </article>
           <article>
             <h3>Entrega</h3>
-            <p>Despacho rapido e embalagens seguras para seu pedido chegar em perfeitas condicoes.</p>
+            <p>{storeInfo?.delivery || 'Despacho rapido e embalagens seguras para todo o Brasil.'}</p>
           </article>
         </div>
       </section>

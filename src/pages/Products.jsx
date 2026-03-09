@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { FilterSidebar } from '../components/FilterSidebar'
 import { ProductGrid } from '../components/ProductGrid'
 import { useCart } from '../context/CartContext'
@@ -9,6 +10,7 @@ import '../styles/products.css'
 
 export const Products = () => {
   const { addToCart } = useCart()
+  const [searchParams] = useSearchParams()
   const [products, setProducts] = useState([])
   const [favoriteIds, setFavoriteIds] = useState(new Set())
   const [loading, setLoading] = useState(true)
@@ -19,9 +21,11 @@ export const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('Todas')
   const [sortBy, setSortBy] = useState('asc')
 
+  const search = searchParams.get('search') || ''
+
   const highestPrice = useMemo(() => {
     if (!products.length) return 0
-    return Math.ceil(Math.max(...products.map((plant) => plant.price)))
+    return Math.ceil(Math.max(...products.map((product) => product.price)))
   }, [products])
 
   useEffect(() => {
@@ -30,7 +34,7 @@ export const Products = () => {
       setError('')
       try {
         const [productsData, categoriesData] = await Promise.all([
-          getStoreProducts(),
+          getStoreProducts(search),
           listCategories(),
         ])
         setProducts(productsData)
@@ -42,26 +46,21 @@ export const Products = () => {
       } catch {
         setError('Nao foi possivel carregar o catalogo.')
       } finally {
+        setFavoriteIds(new Set(getFavorites()))
         setLoading(false)
       }
     }
 
     loadProducts()
-  }, [])
-
-  useEffect(() => {
-    setFavoriteIds(new Set(getFavorites()))
-  }, [])
+  }, [search])
 
   const toggleFavorite = (productId) => {
-    const isActive = favoriteIds.has(productId)
-    if (isActive) {
-      const next = removeFavorite(productId)
-      setFavoriteIds(new Set(next))
-    } else {
-      const next = addFavorite(productId)
-      setFavoriteIds(new Set(next))
+    if (favoriteIds.has(productId)) {
+      setFavoriteIds(new Set(removeFavorite(productId)))
+      return
     }
+
+    setFavoriteIds(new Set(addFavorite(productId)))
   }
 
   const filteredProducts = useMemo(() => {
@@ -77,11 +76,16 @@ export const Products = () => {
   return (
     <section className="products-page">
       <div className="section-header">
-        <h1>Catalogo de Plantas</h1>
+        <div>
+          <h1>Catalogo de Produtos</h1>
+          <p>
+            {search ? `Resultados para "${search}"` : 'Explore o marketplace completo.'}
+          </p>
+        </div>
         <p>{filteredProducts.length} produtos encontrados</p>
       </div>
 
-      {error && <p className="empty-state">{error}</p>}
+      {error ? <p className="empty-state">{error}</p> : null}
 
       <div className="products-layout">
         <FilterSidebar
@@ -105,7 +109,7 @@ export const Products = () => {
             onAddToCart={addToCart}
             favoriteIds={favoriteIds}
             onToggleFavorite={toggleFavorite}
-            emptyMessage="Nenhum produto cadastrado pelo admin ainda."
+            emptyMessage="Nenhum produto encontrado com os filtros atuais."
           />
         )}
       </div>

@@ -12,7 +12,6 @@ import {
 export default function Categories() {
   const [categories, setCategories] = useState([])
   const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [error, setError] = useState('')
@@ -37,27 +36,20 @@ export default function Categories() {
 
   const resetForm = () => {
     setName('')
-    setDescription('')
     setEditingId(null)
     setError('')
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (event) => {
+    event.preventDefault()
     const normalizedName = name.trim()
     if (!normalizedName) return
 
     try {
       if (editingId) {
-        await updateCategory(editingId, {
-          name: normalizedName,
-          description: description.trim(),
-        })
+        await updateCategory(editingId, { name: normalizedName })
       } else {
-        await createCategory({
-          name: normalizedName,
-          description: description.trim(),
-        })
+        await createCategory({ name: normalizedName })
       }
 
       await loadCategories()
@@ -70,12 +62,12 @@ export default function Categories() {
   const startEdit = (category) => {
     setEditingId(category.id)
     setName(category.name || '')
-    setDescription(category.description || '')
     setError('')
   }
 
   const handleDelete = async () => {
     if (!selectedCategory) return
+
     try {
       await deleteCategory(selectedCategory.id)
       setSelectedCategory(null)
@@ -90,11 +82,6 @@ export default function Categories() {
 
   const columns = [
     { key: 'name', header: 'Nome' },
-    {
-      key: 'description',
-      header: 'Descricao',
-      render: (row) => row.description || '-',
-    },
     {
       key: 'acoes',
       header: 'Acoes',
@@ -115,32 +102,27 @@ export default function Categories() {
     <section>
       <div className="admin-section-header">
         <h2>Categorias</h2>
-        <p>CRUD de categorias de produto</p>
+        <p>Gerencie os grupos exibidos no catalogo e na pagina inicial.</p>
       </div>
 
       <form className="admin-form" onSubmit={handleSubmit}>
         <input
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(event) => setName(event.target.value)}
           placeholder="Nome da categoria"
           required
         />
-        <input
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Descricao"
-        />
         <button type="submit" className="btn">
-          {editingId ? 'Salvar Edicao' : 'Criar Categoria'}
+          {editingId ? 'Salvar edicao' : 'Criar categoria'}
         </button>
-        {editingId && (
+        {editingId ? (
           <button type="button" className="btn btn-secondary" onClick={resetForm}>
             Cancelar
           </button>
-        )}
+        ) : null}
       </form>
 
-      {error && <p className="admin-error">{error}</p>}
+      {error ? <p className="admin-error">{error}</p> : null}
 
       {loading ? (
         <div className="admin-empty">Carregando categorias...</div>

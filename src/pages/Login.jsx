@@ -28,7 +28,7 @@ export const Login = () => {
         senha,
       });
 
-      navigate("/home");
+      navigate("/inicio");
     } catch (err) {
       setError(getApiErrorMessage(err, "Email ou senha invalidos"));
     } finally {
