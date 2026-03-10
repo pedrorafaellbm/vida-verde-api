@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { DataTable } from '../../components/admin/DataTable'
+import { useI18n } from '../../context/LocaleContext'
 
 const mockOrders = [
   { id: 'o-1001', cliente: 'Ana Paula', total: 249.8, status: 'pendente' },
@@ -8,57 +9,33 @@ const mockOrders = [
 ]
 
 const statusFlow = ['pendente', 'processando', 'enviado', 'entregue']
-
-const toMoney = (value) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
-
-const nextStatus = (currentStatus) => {
-  const index = statusFlow.indexOf(currentStatus)
-  return statusFlow[(index + 1) % statusFlow.length]
-}
+const toMoney = (value) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'BRL' }).format(value)
+const nextStatus = (currentStatus) => statusFlow[(statusFlow.indexOf(currentStatus) + 1) % statusFlow.length]
 
 export default function Orders() {
+  const { t } = useI18n()
   const [orders, setOrders] = useState([])
 
-  useEffect(() => {
-    setOrders(mockOrders)
-  }, [])
+  useEffect(() => { setOrders(mockOrders) }, [])
 
   const handleStatusChange = (orderId) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId ? { ...order, status: nextStatus(order.status) } : order
-      )
-    )
+    setOrders((prev) => prev.map((order) => order.id === orderId ? { ...order, status: nextStatus(order.status) } : order))
   }
 
+  const statusLabel = (status) => ({ pendente: t('admin.pending'), processando: t('admin.processing'), enviado: t('admin.shipped'), entregue: t('admin.delivered') }[status] || status)
+
   const columns = [
-    { key: 'id', header: 'Pedido' },
-    { key: 'cliente', header: 'Cliente' },
-    { key: 'total', header: 'Total', render: (row) => toMoney(row.total) },
-    {
-      key: 'status',
-      header: 'Status',
-      render: (row) => <span className={`status-pill status-${row.status}`}>{row.status}</span>,
-    },
-    {
-      key: 'acoes',
-      header: 'Acoes',
-      render: (row) => (
-        <button type="button" className="btn btn-secondary" onClick={() => handleStatusChange(row.id)}>
-          Alterar Status
-        </button>
-      ),
-    },
+    { key: 'id', header: t('admin.orders') },
+    { key: 'cliente', header: t('admin.customer') },
+    { key: 'total', header: t('admin.total'), render: (row) => toMoney(row.total) },
+    { key: 'status', header: t('admin.status'), render: (row) => <span className={`status-pill status-${row.status}`}>{statusLabel(row.status)}</span> },
+    { key: 'acoes', header: t('admin.actions'), render: (row) => <button type="button" className="btn btn-secondary" onClick={() => handleStatusChange(row.id)}>{t('admin.changeStatus')}</button> },
   ]
 
   return (
     <section>
-      <div className="admin-section-header">
-        <h2>Pedidos</h2>
-        <p>Gerencie o fluxo de entrega dos pedidos</p>
-      </div>
-      <DataTable columns={columns} data={orders} emptyText="Nenhum pedido encontrado." />
+      <div className="admin-section-header"><h2>{t('admin.orders')}</h2><p>{t('admin.ordersHint')}</p></div>
+      <DataTable columns={columns} data={orders} emptyText={t('admin.noOrders')} />
     </section>
   )
 }

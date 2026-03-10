@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useI18n } from '../context/LocaleContext'
 import { getStoreProductById } from '../service/storeApi'
 import { addFavorite, isFavorite, removeFavorite } from '../utils/favorites'
 import '../styles/products.css'
 
-const formatPrice = (price) =>
-  new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(price)
+const formatPrice = (price) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'BRL' }).format(price)
 
 export const ProductDetails = () => {
   const { id } = useParams()
   const { addToCart } = useCart()
+  const { t } = useI18n()
   const [product, setProduct] = useState(null)
   const [selectedImage, setSelectedImage] = useState('')
   const [favorited, setFavorited] = useState(false)
@@ -24,7 +22,6 @@ export const ProductDetails = () => {
     const loadProduct = async () => {
       setLoading(true)
       setError('')
-
       try {
         const data = await getStoreProductById(id)
         setProduct(data)
@@ -32,32 +29,25 @@ export const ProductDetails = () => {
         setFavorited(isFavorite(data.id))
       } catch {
         setProduct(null)
-        setError('Produto nao encontrado.')
+        setError(t('product.notFound'))
       } finally {
         setLoading(false)
       }
     }
-
     loadProduct()
-  }, [id])
+  }, [id, t])
 
   if (loading) {
-    return (
-      <section className="product-details-page">
-        <p className="empty-state">Carregando produto...</p>
-      </section>
-    )
+    return <section className="product-details-page"><p className="empty-state">{t('product.loading')}</p></section>
   }
 
   const handleToggleFavorite = () => {
     if (!product) return
-
     if (favorited) {
       removeFavorite(product.id)
       setFavorited(false)
       return
     }
-
     addFavorite(product.id)
     setFavorited(true)
   }
@@ -65,10 +55,8 @@ export const ProductDetails = () => {
   if (!product) {
     return (
       <section className="product-details-page">
-        <h1>{error || 'Produto nao encontrado'}</h1>
-        <Link to="/products" className="btn">
-          Voltar para produtos
-        </Link>
+        <h1>{error || t('product.notFound')}</h1>
+        <Link to="/products" className="btn">{t('product.backToProducts')}</Link>
       </section>
     )
   }
@@ -80,46 +68,24 @@ export const ProductDetails = () => {
           <img src={selectedImage} alt={product.name} className="main-image" />
           <div className="thumb-list">
             {product.images.map((image) => (
-              <button
-                key={image}
-                type="button"
-                className={`thumb-button ${selectedImage === image ? 'active' : ''}`}
-                onClick={() => setSelectedImage(image)}
-              >
+              <button key={image} type="button" className={`thumb-button ${selectedImage === image ? 'active' : ''}`} onClick={() => setSelectedImage(image)}>
                 <img src={image} alt={product.name} />
               </button>
             ))}
           </div>
         </div>
-
         <div className="details-panel">
           <h1>{product.name}</h1>
           <p className="details-price">{formatPrice(product.price)}</p>
           <p className="details-description">{product.description}</p>
-
           <ul className="details-info">
-            <li>
-              <strong>Categoria:</strong> {product.category}
-            </li>
-            <li>
-              <strong>Estoque:</strong> {product.stock}
-            </li>
-            <li>
-              <strong>Nivel de cuidado:</strong> {product.careLevel}
-            </li>
+            <li><strong>{t('product.category')}:</strong> {product.category}</li>
+            <li><strong>{t('product.stock')}:</strong> {product.stock}</li>
+            <li><strong>{t('product.careLevel')}:</strong> {product.careLevel}</li>
           </ul>
-
           <div className="details-action-row">
-            <button type="button" className="btn" onClick={() => addToCart(product)}>
-              Adicionar ao carrinho
-            </button>
-            <button
-              type="button"
-              className={`btn btn-secondary details-favorite ${favorited ? 'active' : ''}`}
-              onClick={handleToggleFavorite}
-            >
-              {favorited ? 'Curtido' : 'Curtir'}
-            </button>
+            <button type="button" className="btn" onClick={() => addToCart(product)}>{t('product.addToCart')}</button>
+            <button type="button" className={`btn btn-secondary details-favorite ${favorited ? 'active' : ''}`} onClick={handleToggleFavorite}>{favorited ? t('product.liked') : t('product.like')}</button>
           </div>
         </div>
       </div>

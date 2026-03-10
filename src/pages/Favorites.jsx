@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { ProductGrid } from '../components/ProductGrid'
 import { useCart } from '../context/CartContext'
+import { useI18n } from '../context/LocaleContext'
 import { getFavoriteProducts } from '../service/storeApi'
 import { addFavorite, getFavorites, removeFavorite } from '../utils/favorites'
 
 export const Favorites = () => {
   const { addToCart } = useCart()
+  const { t } = useI18n()
   const [products, setProducts] = useState([])
   const [favoriteIds, setFavoriteIds] = useState(new Set())
   const [loading, setLoading] = useState(true)
@@ -20,14 +22,13 @@ export const Favorites = () => {
         setProducts(data)
         setFavoriteIds(new Set(getFavorites()))
       } catch {
-        setError('Nao foi possivel carregar seus curtidos.')
+        setError(t('favoritesPage.error'))
       } finally {
         setLoading(false)
       }
     }
-
     loadFavorites()
-  }, [])
+  }, [t])
 
   const toggleFavorite = (productId) => {
     if (favoriteIds.has(productId)) {
@@ -36,7 +37,6 @@ export const Favorites = () => {
       setProducts((prev) => prev.filter((item) => item.id !== productId))
       return
     }
-
     const next = addFavorite(productId)
     setFavoriteIds(new Set(next))
   }
@@ -44,23 +44,11 @@ export const Favorites = () => {
   return (
     <section className="products-page">
       <div className="section-header">
-        <h1>Curtidos</h1>
-        <p>{products.length} produtos salvos</p>
+        <h1>{t('favoritesPage.title')}</h1>
+        <p>{products.length} {t('favoritesPage.saved')}</p>
       </div>
-
       {error ? <p className="empty-state">{error}</p> : null}
-
-      {loading ? (
-        <p className="empty-state">Carregando curtidos...</p>
-      ) : (
-        <ProductGrid
-          products={products}
-          onAddToCart={addToCart}
-          favoriteIds={favoriteIds}
-          onToggleFavorite={toggleFavorite}
-          emptyMessage="Voce ainda nao curtiu nenhum produto."
-        />
-      )}
+      {loading ? <p className="empty-state">{t('favoritesPage.loading')}</p> : <ProductGrid products={products} onAddToCart={addToCart} favoriteIds={favoriteIds} onToggleFavorite={toggleFavorite} emptyMessage={t('favoritesPage.empty')} />}
     </section>
   )
 }
