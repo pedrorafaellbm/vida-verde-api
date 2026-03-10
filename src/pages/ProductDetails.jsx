@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useI18n } from '../context/LocaleContext'
 import { getStoreProductById } from '../service/storeApi'
+import { addFavoriteRequest, removeFavoriteRequest } from '../service/api'
 import { addFavorite, isFavorite, removeFavorite } from '../utils/favorites'
 import '../styles/products.css'
 
@@ -41,15 +42,21 @@ export const ProductDetails = () => {
     return <section className="product-details-page"><p className="empty-state">{t('product.loading')}</p></section>
   }
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = async () => {
     if (!product) return
-    if (favorited) {
-      removeFavorite(product.id)
-      setFavorited(false)
-      return
+    try {
+      if (favorited) {
+        await removeFavoriteRequest(product.id)
+        removeFavorite(product.id)
+        setFavorited(false)
+        return
+      }
+      await addFavoriteRequest(product.id)
+      addFavorite(product.id)
+      setFavorited(true)
+    } catch (err) {
+      console.error(err)
     }
-    addFavorite(product.id)
-    setFavorited(true)
   }
 
   if (!product) {

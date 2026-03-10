@@ -7,6 +7,7 @@ import { useCart } from '../context/CartContext'
 import { useI18n } from '../context/LocaleContext'
 import { listCategories } from '../service/adminApi'
 import { getFeaturedProducts, getStoreBanners, getStoreInfo, getStoreProducts } from '../service/storeApi'
+import { addFavoriteRequest, removeFavoriteRequest } from '../service/api'
 import { addFavorite, getFavorites, removeFavorite } from '../utils/favorites'
 import '../styles/home.css'
 
@@ -49,12 +50,19 @@ export const Home = () => {
     loadHomeData()
   }, [t])
 
-  const toggleFavorite = (productId) => {
-    if (favoriteIds.has(productId)) {
-      setFavoriteIds(new Set(removeFavorite(productId)))
-      return
+  const toggleFavorite = async (productId) => {
+    try {
+      if (favoriteIds.has(productId)) {
+        await removeFavoriteRequest(productId)
+        setFavoriteIds(new Set(removeFavorite(productId)))
+        return
+      }
+      await addFavoriteRequest(productId)
+      setFavoriteIds(new Set(addFavorite(productId)))
+    } catch (err) {
+      console.error(err)
+      setError(t('favoritesPage.error'))
     }
-    setFavoriteIds(new Set(addFavorite(productId)))
   }
 
   const allLabel = t('home.allCategory')

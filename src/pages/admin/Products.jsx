@@ -4,7 +4,15 @@ import { DataTable } from '../../components/admin/DataTable'
 import { useI18n } from '../../context/LocaleContext'
 import { createProduct, deleteProduct, getErrorMessage, listCategories, listProducts, updateProduct } from '../../service/adminApi'
 
-const defaultForm = { nome: '', categoria: '', preco: '', estoque: '', descricao: '', imageFile: null }
+const defaultForm = {
+  nome: '',
+  categoria: '',
+  preco: '',
+  estoque: '',
+  descricao: '',
+  featured: false,
+  imageFile: null,
+}
 const toMoney = (value) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'BRL' }).format(Number(value || 0))
 
 export default function AdminProducts() {
@@ -40,14 +48,30 @@ export default function AdminProducts() {
 
   const handleEdit = (product) => {
     setEditingId(product.id)
-    setForm({ nome: product.nome || '', categoria: resolveCategoryName(product), preco: String(product.preco ?? ''), estoque: String(product.estoque ?? ''), descricao: product.descricao || '', imageFile: null })
+    setForm({
+      nome: product.nome || '',
+      categoria: resolveCategoryName(product),
+      preco: String(product.preco ?? ''),
+      estoque: String(product.estoque ?? ''),
+      descricao: product.descricao || '',
+      featured: Boolean(product.featured),
+      imageFile: null,
+    })
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
     setError('')
-    const payload = { nome: form.nome.trim(), categoria: form.categoria, preco: Number(form.preco), estoque: Number(form.estoque), descricao: form.descricao.trim(), imageFile: form.imageFile }
+    const payload = {
+      nome: form.nome.trim(),
+      categoria: form.categoria,
+      preco: Number(form.preco),
+      estoque: Number(form.estoque),
+      descricao: form.descricao.trim(),
+      featured: Boolean(form.featured),
+      imageFile: form.imageFile,
+    }
     try {
       if (editingId) await updateProduct(editingId, payload)
       else await createProduct(payload)
@@ -71,12 +95,30 @@ export default function AdminProducts() {
     }
   }
 
+  const toggleFeatured = async (product) => {
+    try {
+      const updated = await updateProduct(product.id, { featured: !product.featured })
+      setProducts((prev) => prev.map((item) => (item.id === product.id ? updated : item)))
+    } catch (err) {
+      setError(getErrorMessage(err, t('admin.productDataError')))
+    }
+  }
+
   const columns = [
     { key: 'imageUrl', header: t('admin.image'), render: (row) => row.imageUrl ? <img src={row.imageUrl} alt={row.nome} className="admin-product-thumb" /> : <span className="role-chip">{t('common.noImage')}</span> },
     { key: 'nome', header: t('admin.product') },
     { key: 'categoria', header: t('admin.category'), render: (row) => resolveCategoryName(row) || <span className="role-chip">{t('admin.withoutCategory')}</span> },
     { key: 'preco', header: t('admin.price'), render: (row) => toMoney(row.preco) },
     { key: 'estoque', header: t('admin.stock') },
+    {
+      key: 'featured',
+      header: t('admin.featured'),
+      render: (row) => (
+        <button type="button" className="btn btn-secondary" onClick={() => toggleFeatured(row)}>
+          {row.featured ? t('admin.featuredTrue') : t('admin.featuredFalse')}
+        </button>
+      ),
+    },
     { key: 'acoes', header: t('admin.actions'), render: (row) => <div className="admin-actions"><button type="button" className="btn btn-secondary" onClick={() => handleEdit(row)}>{t('common.edit')}</button><button type="button" className="btn" onClick={() => setSelectedProduct(row)}>{t('common.delete')}</button></div> },
   ]
 
@@ -91,8 +133,12 @@ export default function AdminProducts() {
         </select>
         <input type="number" min="0" step="0.01" value={form.preco} onChange={(e) => onChange('preco', e.target.value)} placeholder={t('admin.pricePlaceholder')} required />
         <input type="number" min="0" value={form.estoque} onChange={(e) => onChange('estoque', e.target.value)} placeholder={t('admin.stockPlaceholder')} required />
-        <input value={form.descricao} onChange={(e) => onChange('descricao', e.target.value)} placeholder={t('admin.descriptionPlaceholder')} />
-        <input type="file" accept="image/*" onChange={(e) => onChange('imageFile', e.target.files?.[0] || null)} required={!editingId} />
+          <input value={form.descricao} onChange={(e) => onChange('descricao', e.target.value)} placeholder={t('admin.descriptionPlaceholder')} />
+          <label className="admin-checkbox">
+            <input type="checkbox" checked={form.featured} onChange={(e) => onChange('featured', e.target.checked)} />
+            {t('admin.featured')}
+          </label>
+          <input type="file" accept="image/*" onChange={(e) => onChange('imageFile', e.target.files?.[0] || null)} required={!editingId} />
         <button type="submit" className="btn" disabled={saving}>{saving ? t('admin.saveBannerLoading') : editingId ? t('admin.saveEdit') : t('admin.createProduct')}</button>
         {editingId && <button type="button" className="btn btn-secondary" onClick={resetForm}>{t('common.cancel')}</button>}
       </form>

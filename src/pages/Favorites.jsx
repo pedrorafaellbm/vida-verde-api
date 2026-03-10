@@ -3,6 +3,7 @@ import { ProductGrid } from '../components/ProductGrid'
 import { useCart } from '../context/CartContext'
 import { useI18n } from '../context/LocaleContext'
 import { getFavoriteProducts } from '../service/storeApi'
+import { addFavoriteRequest, removeFavoriteRequest } from '../service/api'
 import { addFavorite, getFavorites, removeFavorite } from '../utils/favorites'
 
 export const Favorites = () => {
@@ -30,15 +31,23 @@ export const Favorites = () => {
     loadFavorites()
   }, [t])
 
-  const toggleFavorite = (productId) => {
-    if (favoriteIds.has(productId)) {
-      const next = removeFavorite(productId)
+  const toggleFavorite = async (productId) => {
+    try {
+      if (favoriteIds.has(productId)) {
+        await removeFavoriteRequest(productId)
+        const next = removeFavorite(productId)
+        setFavoriteIds(new Set(next))
+        setProducts((prev) => prev.filter((item) => item.id !== productId))
+        return
+      }
+
+      await addFavoriteRequest(productId)
+      const next = addFavorite(productId)
       setFavoriteIds(new Set(next))
-      setProducts((prev) => prev.filter((item) => item.id !== productId))
-      return
+    } catch (err) {
+      console.error(err)
+      setError(t('favoritesPage.error'))
     }
-    const next = addFavorite(productId)
-    setFavoriteIds(new Set(next))
   }
 
   return (
