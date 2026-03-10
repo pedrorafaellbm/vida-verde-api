@@ -11,6 +11,7 @@ const defaultForm = {
   estoque: '',
   descricao: '',
   featured: false,
+  careLevel: 'Facil',
   imageFile: null,
 }
 const toMoney = (value) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'BRL' }).format(Number(value || 0))
@@ -43,7 +44,16 @@ export default function AdminProducts() {
   useEffect(() => { loadData() }, [t])
 
   const resetForm = () => { setForm(defaultForm); setEditingId(null) }
-  const onChange = (field, value) => setForm((prev) => ({ ...prev, [field]: value }))
+  const onChange = (field, value) =>
+    setForm((prev) => ({
+      ...prev,
+      [field]:
+        field === 'featured'
+          ? typeof value === 'string'
+            ? value === 'true'
+            : Boolean(value)
+          : value,
+    }))
   const resolveCategoryName = (product) => product?.category?.name || product?.categoria || ''
 
   const handleEdit = (product) => {
@@ -127,10 +137,19 @@ export default function AdminProducts() {
       <div className="admin-section-header"><h2>{t('admin.products')}</h2></div>
       <form className="admin-form" onSubmit={handleSubmit}>
         <input value={form.nome} onChange={(e) => onChange('nome', e.target.value)} placeholder={t('admin.namePlaceholder')} required />
-        <select value={form.categoria} onChange={(e) => onChange('categoria', e.target.value)} disabled={!categories.length}>
-          <option value="">{t('admin.selectCategory')}</option>
-          {categories.map((category) => <option key={category.id} value={category.name}>{category.name}</option>)}
-        </select>
+          <select value={form.categoria} onChange={(e) => onChange('categoria', e.target.value)} disabled={!categories.length}>
+            <option value="">{t('admin.selectCategory')}</option>
+            {categories.map((category) => <option key={category.id} value={category.name}>{category.name}</option>)}
+          </select>
+          <select value={form.featured} onChange={(e) => onChange('featured', e.target.checked)}>
+            <option value="false">{t('admin.featuredFalse')}</option>
+            <option value="true">{t('admin.featuredTrue')}</option>
+          </select>
+          <select value={form.careLevel} onChange={(e) => onChange('careLevel', e.target.value)}>
+            <option value="Facil">{t('admin.careLevelFacil')}</option>
+            <option value="Medio">{t('admin.careLevelMedio')}</option>
+            <option value="Dificil">{t('admin.careLevelDificil')}</option>
+          </select>
         <input type="number" min="0" step="0.01" value={form.preco} onChange={(e) => onChange('preco', e.target.value)} placeholder={t('admin.pricePlaceholder')} required />
         <input type="number" min="0" value={form.estoque} onChange={(e) => onChange('estoque', e.target.value)} placeholder={t('admin.stockPlaceholder')} required />
           <input value={form.descricao} onChange={(e) => onChange('descricao', e.target.value)} placeholder={t('admin.descriptionPlaceholder')} />
