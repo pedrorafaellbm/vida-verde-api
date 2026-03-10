@@ -148,4 +148,23 @@ export const updateStoreInfo = async (payload) => {
   }
 }
 
+export const listStoreInfoCards = async () => {
+  const response = await api.get('/admin/store-info/cards')
+  return response.data?.data || []
+}
+
+export const createStoreInfoCard = async (payload) => {
+  const response = await api.post('/admin/store-info/cards', payload)
+  return response.data?.data
+}
+
+export const updateStoreInfoCard = async (id, payload) => {
+  const response = await api.put(`/admin/store-info/cards/${id}`, payload)
+  return response.data?.data
+}
+
+export const deleteStoreInfoCard = async (id) => {
+  await api.delete(`/admin/store-info/cards/${id}`)
+}
+
 export { getErrorMessage }
