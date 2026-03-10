@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useI18n } from '../context/LocaleContext'
 
 const formatPrice = (price) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'BRL' }).format(price)
-const careClassByLevel = { 'F·cil': 'care-easy', 'MÈdio': 'care-medium', 'DifÌcil': 'care-hard' }
+const careClassByLevel = { 'FÔøΩcil': 'care-easy', 'MÔøΩdio': 'care-medium', 'DifÔøΩcil': 'care-hard' }
 
 export const ProductCard = ({ product, onAddToCart, isFavorited, onToggleFavorite }) => {
   const imageSrc = product.imageUrl || product.image
@@ -11,7 +11,7 @@ export const ProductCard = ({ product, onAddToCart, isFavorited, onToggleFavorit
   return (
     <article className="product-card">
       <button type="button" className={`favorite-btn ${isFavorited ? 'active' : ''}`} onClick={() => onToggleFavorite?.(product.id)} aria-label={isFavorited ? t('product.removeFromFavorites') : t('product.addToFavorites')}>
-        ?
+        <span aria-hidden="true" className="favorite-icon">{isFavorited ? '‚ù§Ô∏è' : 'ü§ç'}</span>
       </button>
       <Link to={`/products/${product.id}`} className="product-image-wrap"><img src={imageSrc} alt={product.name} className="product-image" loading="lazy" /></Link>
       <div className="product-info">
