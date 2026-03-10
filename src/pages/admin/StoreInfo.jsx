@@ -10,7 +10,7 @@ import {
   updateStoreInfoCard,
 } from '../../service/adminApi'
 
-const defaultForm = { title: 'Sobre a Loja', description: '', mission: '', quality: '', delivery: '' }
+const defaultForm = { title: '', description: '', mission: '', quality: '', delivery: '' }
 const defaultCardForm = { title: '', body: '', position: 0 }
 
 export default function StoreInfo() {
