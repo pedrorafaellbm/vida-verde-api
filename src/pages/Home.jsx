@@ -111,9 +111,18 @@ export const Home = () => {
           </div>
         </div>
         <div className="about-grid">
-          <article><h3>{t('home.mission')}</h3><p>{storeInfo?.mission || t('home.missionFallback')}</p></article>
-          <article><h3>{t('home.quality')}</h3><p>{storeInfo?.quality || t('home.qualityFallback')}</p></article>
-          <article><h3>{t('home.delivery')}</h3><p>{storeInfo?.delivery || t('home.deliveryFallback')}</p></article>
+          {(storeInfo?.cards?.length
+            ? storeInfo.cards.map((card) => ({ title: card.title, body: card.body, id: card.id }))
+            : [
+                { title: t('home.mission'), body: storeInfo?.mission || t('home.missionFallback'), id: 'mission' },
+                { title: t('home.quality'), body: storeInfo?.quality || t('home.qualityFallback'), id: 'quality' },
+                { title: t('home.delivery'), body: storeInfo?.delivery || t('home.deliveryFallback'), id: 'delivery' },
+              ]).map((card) => (
+            <article key={card.id}>
+              <h3>{card.title}</h3>
+              <p>{card.body}</p>
+            </article>
+          ))}
         </div>
       </section>
     </section>
